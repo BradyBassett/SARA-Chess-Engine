@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "../Include/Structs/Position.hpp"
+#include "../include/structs/Position.hpp"
 class Bitboard
 {
 public:
@@ -14,34 +14,29 @@ public:
 	uint64_t getValue() const;
 	void setValue(uint64_t value);
 
-	void setBit(int index);
-	void clearBit(int index);
-	bool getBit(int index) const;
+	void setBit(Position position);
+	void clearBit(Position position);
+	bool getBit(Position position) const;
 
 	Bitboard operator|(const Bitboard &other) const;
-
 	Bitboard &operator|=(const Bitboard &other);
-
 	Bitboard operator&(const Bitboard &other) const;
-
 	Bitboard &operator&=(const Bitboard &other);
-
 	Bitboard operator^(const Bitboard &other) const;
-
 	Bitboard &operator^=(const Bitboard &other);
-
 	Bitboard operator~() const;
-
 	Bitboard operator<<(uint64_t shift) const;
-
 	Bitboard &operator<<=(uint64_t shift);
-
 	Bitboard operator>>(uint64_t shift) const;
-
 	Bitboard &operator>>=(uint64_t shift);
+	bool operator==(const Bitboard &other) const;
+	bool operator!=(const Bitboard &other) const;
+	bool operator!=(uint64_t other) const;
 
 private:
 	uint64_t value = 0x0;
+
+	int calculateSquareNumber(Position position) const;
 };
 
 #endif // BITBOARD_HPP

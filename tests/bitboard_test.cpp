@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "../Include/Bitboard.hpp"
+#include "../include/Bitboard.hpp"
 
 TEST(Bitboard, DefaultConstructor)
 {
