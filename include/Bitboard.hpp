@@ -31,12 +31,12 @@ public:
 	Bitboard &operator>>=(uint64_t shift);
 	bool operator==(const Bitboard &other) const;
 	bool operator!=(const Bitboard &other) const;
-	bool operator!=(uint64_t other) const;
 
 private:
 	uint64_t value = 0x0;
 
 	int calculateSquareNumber(Position position) const;
+	void validatePosition(Position position) const;
 };
 
 #endif // BITBOARD_HPP
