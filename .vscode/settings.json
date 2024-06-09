@@ -1,5 +1,10 @@
 {
 	"files.associations": {
 		"cstdint": "cpp"
-	}
+	},
+	"testMate.cpp.test.advancedExecutables": [
+		{
+			"pattern": "${workspaceFolder}/build/SARA_tests"
+		}
+	]
 }
