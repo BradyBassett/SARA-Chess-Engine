@@ -1,22 +1,22 @@
 cmake_minimum_required(VERSION 3.14)
-project(chess-engine-api)
+project(SARA)
 
 # GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include directories
-include_directories(${PROJECT_SOURCE_DIR}/Include)
-include_directories(${PROJECT_SOURCE_DIR}/Src)
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/src)
 
 # Collect all source files, excluding main.cpp
-file(GLOB_RECURSE SOURCES "Src/[!main]*.cpp")
+file(GLOB_RECURSE SOURCES "src/[!main]*.cpp")
 
 # Add executable
-add_executable(${PROJECT_NAME} ${SOURCES} "Src/main.cpp")
+add_executable(${PROJECT_NAME} ${SOURCES} "src/main.cpp")
 
 # Collect all test source files
-file(GLOB_RECURSE TEST_SOURCES "Tests/*.cpp")
+file(GLOB_RECURSE TEST_SOURCES "tests/*.cpp")
 
 # Add test executable
 add_executable(${PROJECT_NAME}_tests ${TEST_SOURCES} ${SOURCES})
