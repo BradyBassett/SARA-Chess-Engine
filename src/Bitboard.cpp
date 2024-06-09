@@ -1,4 +1,4 @@
-#include "Bitboard.hpp"
+#include "../include/Bitboard.hpp"
 
 Bitboard::Bitboard()
 {
