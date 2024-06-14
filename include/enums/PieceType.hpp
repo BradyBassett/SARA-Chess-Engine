@@ -1,14 +1,14 @@
 #ifndef PIECETYPE_HPP
 #define PIECETYPE_HPP
 
-enum class PieceType
+enum PieceType
 {
-	PAWN,
-	KNIGHT,
-	BISHOP,
-	ROOK,
-	QUEEN,
-	KING
+	PAWN = 0,
+	KNIGHT = 1,
+	BISHOP = 2,
+	ROOK = 3,
+	QUEEN = 4,
+	KING = 5
 };
 
 #endif // PIECETYPE_HPP
