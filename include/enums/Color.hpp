@@ -1,10 +1,10 @@
 #ifndef COLOR_HPP
 #define COLOR_HPP
 
-enum class Color
+enum Color
 {
-	WHITE,
-	BLACK
+	WHITE = 0,
+	BLACK = 1
 };
 
 #endif // COLOR_HPP
