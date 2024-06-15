@@ -29,6 +29,51 @@ void Board::setEnPassantTargetSquare(Position enPassantTargetSquare)
 	this->enPassantTargetSquare = enPassantTargetSquare;
 }
 
+std::string Board::boardToAscii() const
+{
+    std::string asciiBoard = "";
+	const std::string PURPLE = "\033[34m";
+    const std::string RESET = "\033[0m";
+
+    for (int row = 0; row < 8; row++)
+    {
+        asciiBoard += "--+---+---+---+---+---+---+---+---+\n";
+        asciiBoard += PURPLE + std::to_string(8 - row) + RESET + " | ";
+        for (int col = 0; col < 8; col++)
+        {
+            char pieceChar = ' ';
+            for (Color color : {Color::WHITE, Color::BLACK})
+            {
+                for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
+                {
+                    if (getPieceBitboard(piece, color).getBit({row, col}))
+                    {
+                        pieceChar = pieceToChar(piece, color);
+                        break;
+                    }
+                }
+                if (pieceChar != ' ') break;
+            }
+            asciiBoard += pieceChar;
+            asciiBoard += " | ";
+        }
+        asciiBoard += "\n";
+    }
+    asciiBoard += "--+---+---+---+---+---+---+---+---+\n ";
+
+	for (char file = 'a'; file <= 'h'; file++)
+	{
+		asciiBoard += " | " + PURPLE + file + RESET;
+	}
+
+    return asciiBoard;
+}
+
+Position Board::convertStringToPosition(std::string position)
+{
+	return Position{8 - (position[1] - '0'), position[0] - 'a'};
+}
+
 void Board::parseFenPosition(std::string fenPosition)
 {
 	int rowIndex = 0;
@@ -81,7 +126,23 @@ void Board::parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare)
 	}
 }
 
-Position Board::convertStringToPosition(std::string position)
+char Board::pieceToChar(PieceType piece, Color color) const
 {
-	return Position{8 - (position[1] - '0'), position[0] - 'a'};
+	switch (piece)
+	{
+	case PieceType::PAWN:
+		return color == Color::WHITE ? 'P' : 'p';
+	case PieceType::KNIGHT:
+		return color == Color::WHITE ? 'N' : 'n';
+	case PieceType::BISHOP:
+		return color == Color::WHITE ? 'B' : 'b';
+	case PieceType::ROOK:
+		return color == Color::WHITE ? 'R' : 'r';
+	case PieceType::QUEEN:
+		return color == Color::WHITE ? 'Q' : 'q';
+	case PieceType::KING:
+		return color == Color::WHITE ? 'K' : 'k';
+	default:
+		return ' ';
+	}
 }
