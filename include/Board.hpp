@@ -20,6 +20,8 @@ public:
 	std::optional<Position> getEnPassantTargetSquare() const;
 	void setEnPassantTargetSquare(Position enPassantTargetSquare);
 
+	std::string boardToAscii() const;
+	Position convertStringToPosition(std::string position);
 	// Bitboard getPawnAttackTable(Position position, Color color) const;
 	// Bitboard getKnightAttackTable(Position position) const;
 	// Bitboard getBishopAttackTable(Position position) const;
@@ -39,7 +41,7 @@ private:
 
 	void parseFenPosition(std::string fenPosition);
 	void parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare);
-	Position convertStringToPosition(std::string position);
+	char pieceToChar(PieceType piece, Color color) const;
 };
 
 #endif // BOARD_HPP
