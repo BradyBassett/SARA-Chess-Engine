@@ -24,6 +24,11 @@ void Game::setActiveColor(Color activeColor)
 	this->activeColor = activeColor;
 }
 
+Board Game::getBoard() const
+{
+	return board;
+}
+
 int Game::getHalfMoveClock() const
 {
 	return halfMoveClock;
@@ -54,9 +59,9 @@ CastleRights Game::getBlackCastleRights() const
 	return blackCastleRights;
 }
 
-void Game::switchActiveColor(Color color)
+void Game::switchActiveColor()
 {
-	color == Color::WHITE ? activeColor = Color::BLACK : activeColor = Color::WHITE;
+	activeColor == Color::WHITE ? activeColor = Color::BLACK : activeColor = Color::WHITE;
 }
 
 void Game::incrementHalfMoveClock()
