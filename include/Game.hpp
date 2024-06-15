@@ -18,6 +18,7 @@ public:
 
 	Color getActiveColor() const;
 	void setActiveColor(Color activeColor);
+	Board getBoard() const;
 	int getHalfMoveClock() const;
 	void setHalfMoveClock(int halfMoveClock);
 	int getFullMoveNumber() const;
@@ -25,7 +26,7 @@ public:
 	CastleRights getWhiteCastleRights() const;
 	CastleRights getBlackCastleRights() const;
 
-	void switchActiveColor(Color color);
+	void switchActiveColor();
 	void incrementHalfMoveClock();
 	void incrementFullMoveNumber();
 
