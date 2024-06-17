@@ -22,12 +22,6 @@ public:
 
 	std::string boardToAscii() const;
 	Position convertStringToPosition(std::string position);
-	// Bitboard getPawnAttackTable(Position position, Color color) const;
-	// Bitboard getKnightAttackTable(Position position) const;
-	// Bitboard getBishopAttackTable(Position position) const;
-	// Bitboard getRookAttackTable(Position position) const;
-	// Bitboard getQueenAttackTable(Position position) const;
-	// Bitboard getKingAttackTable(Position position) const;
 
 private:
 	std::array<std::array<Bitboard, 6>, 2> pieceBitboards;

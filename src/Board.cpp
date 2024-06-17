@@ -11,12 +11,12 @@ Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare)
 
 Bitboard Board::getPieceBitboard(PieceType piece, Color color) const
 {
-	return pieceBitboards[color][piece];
+	return pieceBitboards[static_cast<int>(color)][static_cast<int>(piece)];
 }
 
 void Board::setPieceBitboard(PieceType piece, Color color, Bitboard bitboard)
 {
-	pieceBitboards[color][piece] = bitboard;
+	pieceBitboards[static_cast<int>(color)][static_cast<int>(piece)] = bitboard;
 }
 
 std::optional<Position> Board::getEnPassantTargetSquare() const
@@ -46,7 +46,7 @@ std::string Board::boardToAscii() const
             {
                 for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
                 {
-                    if (getPieceBitboard(piece, color).getBit({row, col}))
+                    if (getPieceBitboard(piece, color).getBit(Position{row, col}))
                     {
                         pieceChar = pieceToChar(piece, color);
                         break;
