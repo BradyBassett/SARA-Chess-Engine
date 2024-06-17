@@ -36,7 +36,7 @@ TEST(Bitboard, PositionConstructor)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			Position position = {i, j};
+			Position position{i, j};
 			uint64_t expectedValue = 0x1ULL << (i * 8 + j);
 			Bitboard bitboard(position);
 
@@ -54,7 +54,7 @@ TEST(Bitboard, SetGetClearBit)
 		{
 			for (int j = 0; j < 8; j++)
 			{
-				Position position = {i, j};
+				Position position{i, j};
 				bitboard.setBit(position);
 				ASSERT_TRUE(bitboard.getBit(position));
 				bitboard.clearBit(position);
@@ -69,7 +69,7 @@ TEST(Bitboard, SetGetClearBit)
 		{
 			for (int j = 0; j < 8; j++)
 			{
-				Position position = {i, j};
+				Position position{i, j};
 				ASSERT_FALSE(bitboard.getBit(position));
 			}
 		}
