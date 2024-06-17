@@ -1,7 +1,7 @@
 #ifndef PIECETYPE_HPP
 #define PIECETYPE_HPP
 
-enum PieceType
+enum class PieceType
 {
 	PAWN = 0,
 	KNIGHT = 1,
