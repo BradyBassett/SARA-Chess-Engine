@@ -116,6 +116,6 @@ void Game::parseCastlingRights(std::string castlingRights)
     bool blackCanCastleKingside = castlingRights.find('k') != std::string::npos;
     bool blackCanCastleQueenside = castlingRights.find('q') != std::string::npos;
 
-    whiteCastleRights = CastleRights(whiteCanCastleKingside, whiteCanCastleQueenside);
-    blackCastleRights = CastleRights(blackCanCastleKingside, blackCanCastleQueenside);
+    whiteCastleRights = CastleRights{whiteCanCastleKingside, whiteCanCastleQueenside};
+    blackCastleRights = CastleRights{blackCanCastleKingside, blackCanCastleQueenside};
 }

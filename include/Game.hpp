@@ -6,8 +6,8 @@
 #include <unordered_map>
 
 #include "Board.hpp"
+#include "Move.hpp"
 #include "enums/Color.hpp"
-#include "structs/Move.hpp"
 #include "structs/CastleRights.hpp"
 
 class Game
@@ -35,8 +35,8 @@ private:
 	Board board;
 	std::vector<Move> moveHistory;
 	std::unordered_map<std::string, int> gameStateHistory;
-	int halfMoveClock;
-	int fullMoveNumber;
+	uint8_t halfMoveClock;
+	uint16_t fullMoveNumber;
 	CastleRights whiteCastleRights;
 	CastleRights blackCastleRights;
 
