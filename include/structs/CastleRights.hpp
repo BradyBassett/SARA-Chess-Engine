@@ -33,6 +33,11 @@ struct CastleRights
 	{
 		queenSide = false;
 	}
+
+	bool operator==(const CastleRights &other) const
+	{
+		return kingSide == other.kingSide && queenSide == other.queenSide;
+	}
 };
 
 #endif // CASTLERIGHTS_HPP
