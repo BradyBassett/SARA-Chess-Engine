@@ -15,7 +15,7 @@ Bitboard::Bitboard(Position position)
 {
 	Utility::validatePosition(position);
 
-	value = 0x1ULL << (position.row * 8 + position.col);
+	value = 0x1ULL << Utility::calculateSquareNumber(position);
 }
 
 uint64_t Bitboard::getValue() const
@@ -32,7 +32,7 @@ void Bitboard::setBit(Position position)
 {
 	Utility::validatePosition(position);
 
-	uint64_t bit = 1ULL << calculateSquareNumber(position);
+	uint64_t bit = 1ULL << Utility::calculateSquareNumber(position);
 	value |= bit;
 }
 
@@ -40,14 +40,14 @@ void Bitboard::clearBit(Position position)
 {
 	Utility::validatePosition(position);
 
-	value &= ~(1ULL << calculateSquareNumber(position));
+	value &= ~(1ULL << Utility::calculateSquareNumber(position));
 }
 
 bool Bitboard::getBit(Position position) const
 {
 	Utility::validatePosition(position);
 
-	return value & (1ULL << calculateSquareNumber(position));
+	return value & (1ULL << Utility::calculateSquareNumber(position));
 }
 
 Bitboard Bitboard::operator|(const Bitboard &other) const
@@ -144,9 +144,4 @@ bool Bitboard::operator!=(const Bitboard &other) const
 {
 	bool notEqual = value != other.value;
 	return notEqual;
-}
-
-int Bitboard::calculateSquareNumber(Position position) const
-{
-	return position.row * 8 + position.col;
 }
