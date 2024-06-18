@@ -39,7 +39,9 @@ private:
 	std::array<PieceList, 2> queens;
 	std::array<int, 2> kings; // King is not a list because there can only be one king per color
 
+	void initializePieceLists();
 	void parseFenPosition(std::string fenPosition);
+	void loadPieceFromFen(PieceType piece, Color color, int square);
 	void parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare);
 	char pieceToChar(PieceType piece, Color color) const;
 };

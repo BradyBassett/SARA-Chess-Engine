@@ -6,6 +6,7 @@
 
 Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare)
 {
+	initializePieceLists();
 	parseFenPosition(fenPosition);
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
 }
@@ -72,6 +73,18 @@ std::string Board::boardToAscii() const
     return asciiBoard;
 }
 
+void Board::initializePieceLists()
+{
+	for (int color = 0; color < 2; color++)
+	{
+		pawns[color] = PieceList(8);
+		knights[color] = PieceList(10);
+		bishops[color] = PieceList(10);
+		rooks[color] = PieceList(10);
+		queens[color] = PieceList(9);
+	}
+}
+
 void Board::parseFenPosition(std::string fenPosition)
 {
 	int rowIndex = 0;
@@ -103,13 +116,37 @@ void Board::parseFenPosition(std::string fenPosition)
 			PieceType piece = charToPiece[tolower(c)];
 
 			Position position{rowIndex, colIndex};
-			Bitboard temp1 = getPieceBitboard(piece, color);
-			Bitboard temp2 = Bitboard(position);
-			Bitboard temp3 = temp1 | temp2;
+			int square = Utility::calculateSquareNumber(position);
 			setPieceBitboard(piece, color, getPieceBitboard(piece, color) | Bitboard(position));
+			loadPieceFromFen(piece, color, square); // Todo: Add validation in tests for the piece lists
 			colIndex++;
 		}
 	}
+}
+
+void Board::loadPieceFromFen(PieceType piece, Color color, int square)
+{
+	switch (piece)
+		{
+			case PieceType::PAWN:
+				pawns[static_cast<int>(color)].addPiece(square);
+				break;
+			case PieceType::KNIGHT:
+				knights[static_cast<int>(color)].addPiece(square);
+				break;
+			case PieceType::BISHOP:
+				bishops[static_cast<int>(color)].addPiece(square);
+				break;
+			case PieceType::ROOK:
+				rooks[static_cast<int>(color)].addPiece(square);
+				break;
+			case PieceType::QUEEN:
+				queens[static_cast<int>(color)].addPiece(square);
+				break;
+			case PieceType::KING:
+				kings[static_cast<int>(color)] = square;
+				break;
+		}
 }
 
 void Board::parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare)
