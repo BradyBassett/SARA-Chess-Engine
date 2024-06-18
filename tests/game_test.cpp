@@ -2,25 +2,6 @@
 
 #include "../include/Game.hpp"
 
-TEST(Game, GameDefaultConstructor)
-{
-	Game game;
-
-	EXPECT_EQ(game.getActiveColor(), Color::WHITE);
-	EXPECT_EQ(game.getHalfMoveClock(), 0);
-	EXPECT_EQ(game.getFullMoveNumber(), 1);
-
-	bool whiteCanCastleKingside = game.getWhiteCastleRights().canCastleKingSide();
-	bool whiteCanCastleQueenside = game.getWhiteCastleRights().canCastleQueenSide();
-	bool blackCanCastleKingside = game.getBlackCastleRights().canCastleKingSide();
-	bool blackCanCastleQueenside = game.getBlackCastleRights().canCastleQueenSide();
-
-	EXPECT_TRUE(whiteCanCastleKingside);
-	EXPECT_TRUE(whiteCanCastleQueenside);
-	EXPECT_TRUE(blackCanCastleKingside);
-	EXPECT_TRUE(blackCanCastleQueenside);
-}
-
 struct GameConstructorTestParams
 {
 	std::string fen;
@@ -56,6 +37,7 @@ TEST_P(GameConstructorTest, GameConstructor)
 }
 
 const auto gameConstructorTestParams = ::testing::Values(
+	GameConstructorTestParams{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", Color::WHITE, 0, 1, true, true, true, true},
 	GameConstructorTestParams{"3R1N2/2p5/7K/1PP5/k1P4n/b1P1rPpR/2r1Ppbq/4BN2 w - - 0 1", Color::WHITE, 0, 1, false, false, false, false},
 	GameConstructorTestParams{"3R1N2/2p5/7K/1PP5/k1P4n/b1P1rPpR/2r1Ppbq/4BN2 b - - 0 1", Color::BLACK, 0, 1, false, false, false, false},
 	GameConstructorTestParams{"r3k2r/p1qp1ppp/bpnb1n2/2p1p3/1P1P1P2/B1P2NPB/P1QNP2P/R3K2R b KQkq - 3 10", Color::BLACK, 3, 10, true, true, true, true},
