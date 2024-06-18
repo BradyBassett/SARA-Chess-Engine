@@ -9,6 +9,7 @@
 #include "enums/PieceType.hpp"
 #include "enums/Color.hpp"
 #include "structs/Position.hpp"
+#include "structs/PieceList.hpp"
 
 class Board
 {
@@ -21,7 +22,6 @@ public:
 	void setEnPassantTargetSquare(Position enPassantTargetSquare);
 
 	std::string boardToAscii() const;
-	Position convertStringToPosition(std::string position);
 
 private:
 	std::array<std::array<Bitboard, 6>, 2> pieceBitboards;
@@ -32,6 +32,12 @@ private:
 	std::array<Bitboard, 64> queenAttackTable;
 	std::array<Bitboard, 64> kingAttackTable;
 	std::optional<Position> enPassantTargetSquare;
+	std::array<PieceList, 2> pawns;
+	std::array<PieceList, 2> knights;
+	std::array<PieceList, 2> bishops;
+	std::array<PieceList, 2> rooks;
+	std::array<PieceList, 2> queens;
+	std::array<int, 2> kings; // King is not a list because there can only be one king per color
 
 	void parseFenPosition(std::string fenPosition);
 	void parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare);

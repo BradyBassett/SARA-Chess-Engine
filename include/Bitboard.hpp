@@ -35,8 +35,6 @@ public:
 
 private:
 	uint64_t value = 0x0;
-
-	int calculateSquareNumber(Position position) const;
 };
 
 #endif // BITBOARD_HPP
