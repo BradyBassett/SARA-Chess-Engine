@@ -1,5 +1,7 @@
 #include "../include/Move.hpp"
 
+#include <stdexcept>
+
 Move::Move(Position from, Position to, PieceType pieceType, Color color,
 		   std::optional<PieceType> capturedPiece, std::optional<Position> enPassantTargetSquare,
 		   SpecialMove specialMove, CastleRights whiteCastleRights, CastleRights blackCastleRights,
@@ -29,6 +31,11 @@ Position Move::getFrom() const
 
 void Move::setFrom(Position from)
 {
+	if (from.row < 0 || from.row > 7 || from.col < 0 || from.col > 7)
+	{
+		throw std::invalid_argument("Invalid position");
+	}
+
 	int fromSquare = from.row * 8 + from.col;
 
 	move = encode(FROM_MASK, FROM_SHIFT, fromSquare);
@@ -45,6 +52,11 @@ Position Move::getTo() const
 
 void Move::setTo(Position to)
 {
+	if (to.row < 0 || to.row > 7 || to.col < 0 || to.col > 7)
+	{
+		throw std::invalid_argument("Invalid position");
+	}
+
 	int toSquare = to.row * 8 + to.col;
 
 	move = encode(TO_MASK, TO_SHIFT, toSquare);
@@ -119,6 +131,12 @@ void Move::setEnPassantTargetSquare(std::optional<Position> enPassantTargetSquar
 	{
 		int row = enPassantTargetSquare.value().row;
 		int col = enPassantTargetSquare.value().col;
+
+		if (row < 0 || row > 7 || col < 0 || col > 7)
+		{
+			throw std::invalid_argument("Invalid position");
+		}
+
 		int enPassantTargetSquare = row * 8 + col;
 
 		move = encode(EN_PASSANT_TARGET_SQUARE_PRESENT_MASK, EN_PASSANT_TARGET_SQUARE_PRESENT_SHIFT, 1);
