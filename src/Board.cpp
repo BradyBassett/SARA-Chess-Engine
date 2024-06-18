@@ -72,15 +72,6 @@ std::string Board::boardToAscii() const
     return asciiBoard;
 }
 
-Position Board::convertStringToPosition(std::string position)
-{
-	Position pos{8 - (position[1] - '0'), position[0] - 'a'};
-
-	Utility::validatePosition(pos);
-
-	return pos;
-}
-
 void Board::parseFenPosition(std::string fenPosition)
 {
 	int rowIndex = 0;
@@ -129,7 +120,7 @@ void Board::parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare)
 	}
 	else
 	{
-		enPassantTargetSquare = convertStringToPosition(fenEnPassantTargetSquare);
+		enPassantTargetSquare = Utility::convertStringToPosition(fenEnPassantTargetSquare);
 	}
 }
 
