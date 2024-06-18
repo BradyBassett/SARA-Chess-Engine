@@ -1,9 +1,10 @@
 #ifndef BITBOARD_HPP
 #define BITBOARD_HPP
 
+#include "../include/structs/Position.hpp"
+
 #include <cstdint>
 
-#include "../include/structs/Position.hpp"
 class Bitboard
 {
 public:
@@ -36,7 +37,6 @@ private:
 	uint64_t value = 0x0;
 
 	int calculateSquareNumber(Position position) const;
-	void validatePosition(Position position) const;
 };
 
 #endif // BITBOARD_HPP

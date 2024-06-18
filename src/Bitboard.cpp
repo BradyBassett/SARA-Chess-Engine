@@ -1,5 +1,5 @@
 #include "../include/Bitboard.hpp"
-#include <stdexcept>
+#include "../include/Utility.hpp"
 
 Bitboard::Bitboard()
 {
@@ -13,6 +13,8 @@ Bitboard::Bitboard(uint64_t value)
 
 Bitboard::Bitboard(Position position)
 {
+	Utility::validatePosition(position);
+
 	value = 0x1ULL << (position.row * 8 + position.col);
 }
 
@@ -28,7 +30,7 @@ void Bitboard::setValue(uint64_t value)
 
 void Bitboard::setBit(Position position)
 {
-	validatePosition(position);
+	Utility::validatePosition(position);
 
 	uint64_t bit = 1ULL << calculateSquareNumber(position);
 	value |= bit;
@@ -36,14 +38,14 @@ void Bitboard::setBit(Position position)
 
 void Bitboard::clearBit(Position position)
 {
-	validatePosition(position);
+	Utility::validatePosition(position);
 
 	value &= ~(1ULL << calculateSquareNumber(position));
 }
 
 bool Bitboard::getBit(Position position) const
 {
-	validatePosition(position);
+	Utility::validatePosition(position);
 
 	return value & (1ULL << calculateSquareNumber(position));
 }
@@ -147,12 +149,4 @@ bool Bitboard::operator!=(const Bitboard &other) const
 int Bitboard::calculateSquareNumber(Position position) const
 {
 	return position.row * 8 + position.col;
-}
-
-void Bitboard::validatePosition(Position position) const
-{
-	if (position.row < 0 || position.row > 7 || position.col < 0 || position.col > 7)
-	{
-		throw std::invalid_argument("Position out of bounds");
-	}
 }

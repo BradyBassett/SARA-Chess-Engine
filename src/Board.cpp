@@ -1,5 +1,6 @@
 #include "../include/Board.hpp"
 #include "../include/enums/PieceType.hpp"
+#include "../include/Utility.hpp"
 
 #include <map>
 
@@ -26,6 +27,8 @@ std::optional<Position> Board::getEnPassantTargetSquare() const
 
 void Board::setEnPassantTargetSquare(Position enPassantTargetSquare)
 {
+	Utility::validatePosition(enPassantTargetSquare);
+
 	this->enPassantTargetSquare = enPassantTargetSquare;
 }
 
@@ -71,7 +74,11 @@ std::string Board::boardToAscii() const
 
 Position Board::convertStringToPosition(std::string position)
 {
-	return Position{8 - (position[1] - '0'), position[0] - 'a'};
+	Position pos{8 - (position[1] - '0'), position[0] - 'a'};
+
+	Utility::validatePosition(pos);
+
+	return pos;
 }
 
 void Board::parseFenPosition(std::string fenPosition)

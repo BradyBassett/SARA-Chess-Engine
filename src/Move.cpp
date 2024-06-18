@@ -1,6 +1,5 @@
 #include "../include/Move.hpp"
-
-#include <stdexcept>
+#include "../include/Utility.hpp"
 
 Move::Move(Position from, Position to, PieceType pieceType, Color color,
 		   std::optional<PieceType> capturedPiece, std::optional<Position> enPassantTargetSquare,
@@ -31,10 +30,7 @@ Position Move::getFrom() const
 
 void Move::setFrom(Position from)
 {
-	if (from.row < 0 || from.row > 7 || from.col < 0 || from.col > 7)
-	{
-		throw std::invalid_argument("Invalid position");
-	}
+	Utility::validatePosition(from);
 
 	int fromSquare = from.row * 8 + from.col;
 
@@ -52,10 +48,7 @@ Position Move::getTo() const
 
 void Move::setTo(Position to)
 {
-	if (to.row < 0 || to.row > 7 || to.col < 0 || to.col > 7)
-	{
-		throw std::invalid_argument("Invalid position");
-	}
+	Utility::validatePosition(to);
 
 	int toSquare = to.row * 8 + to.col;
 
@@ -132,10 +125,7 @@ void Move::setEnPassantTargetSquare(std::optional<Position> enPassantTargetSquar
 		int row = enPassantTargetSquare.value().row;
 		int col = enPassantTargetSquare.value().col;
 
-		if (row < 0 || row > 7 || col < 0 || col > 7)
-		{
-			throw std::invalid_argument("Invalid position");
-		}
+		Utility::validatePosition(enPassantTargetSquare.value());
 
 		int enPassantTargetSquare = row * 8 + col;
 
