@@ -2,26 +2,6 @@
 
 #include "../include/Board.hpp"
 
-TEST(Board, BoardDefaultConstructor)
-{
-	Board board;
-
-	EXPECT_EQ(board.getPieceBitboard(PieceType::PAWN, Color::WHITE), Bitboard(0xff000000000000ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::PAWN, Color::BLACK), Bitboard(0xff00ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::KNIGHT, Color::WHITE), Bitboard(0x4200000000000000ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::KNIGHT, Color::BLACK), Bitboard(0x42ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::BISHOP, Color::WHITE), Bitboard(0x2400000000000000ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::BISHOP, Color::BLACK), Bitboard(0x24ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::ROOK, Color::WHITE), Bitboard(0x8100000000000000ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::ROOK, Color::BLACK), Bitboard(0x81ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::QUEEN, Color::WHITE), Bitboard(0x800000000000000ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::QUEEN, Color::BLACK), Bitboard(0x8ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::KING, Color::WHITE), Bitboard(0x1000000000000000ULL));
-	EXPECT_EQ(board.getPieceBitboard(PieceType::KING, Color::BLACK), Bitboard(0x10ULL));
-
-	EXPECT_EQ(board.getEnPassantTargetSquare(), std::nullopt);
-}
-
 struct BoardConstructorTestParams
 {
 	std::string fenPosition;
@@ -65,6 +45,23 @@ TEST_P(BoardConstructorTest, BoardConstructor)
 }
 
 const auto boardConstructorTestParams = ::testing::Values(
+	BoardConstructorTestParams{
+		"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+		"-",
+		0xff000000000000ULL,
+		0xff00ULL,
+		0x4200000000000000ULL,
+		0x42ULL,
+		0x2400000000000000ULL,
+		0x24ULL,
+		0x8100000000000000ULL,
+		0x81ULL,
+		0x800000000000000ULL,
+		0x8ULL,
+		0x1000000000000000ULL,
+		0x10ULL,
+		std::nullopt
+	},
 	BoardConstructorTestParams{
 		"1k5B/3p2pq/Qp1bb1PP/p1n1N1P1/1pP3Pp/N2RKp1r/P1B1Pp1P/1r2nR2",
 		"-",
