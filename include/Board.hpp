@@ -20,6 +20,12 @@ public:
 	void setPieceBitboard(PieceType piece, Color color, Bitboard bitboard);
 	std::optional<Position> getEnPassantTargetSquare() const;
 	void setEnPassantTargetSquare(Position enPassantTargetSquare);
+	PieceList &getPawns(Color color);
+	PieceList &getKnights(Color color);
+	PieceList &getBishops(Color color);
+	PieceList &getRooks(Color color);
+	PieceList &getQueens(Color color);
+	int getKing(Color color);
 
 	std::string boardToAscii() const;
 

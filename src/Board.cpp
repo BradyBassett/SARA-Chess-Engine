@@ -33,6 +33,36 @@ void Board::setEnPassantTargetSquare(Position enPassantTargetSquare)
 	this->enPassantTargetSquare = enPassantTargetSquare;
 }
 
+PieceList &Board::getPawns(Color color)
+{
+	return pawns[static_cast<int>(color)];
+}
+
+PieceList &Board::getKnights(Color color)
+{
+	return knights[static_cast<int>(color)];
+}
+
+PieceList &Board::getBishops(Color color)
+{
+	return bishops[static_cast<int>(color)];
+}
+
+PieceList &Board::getRooks(Color color)
+{
+	return rooks[static_cast<int>(color)];
+}
+
+PieceList &Board::getQueens(Color color)
+{
+	return queens[static_cast<int>(color)];
+}
+
+int Board::getKing(Color color)
+{
+	return kings[static_cast<int>(color)];
+}
+
 std::string Board::boardToAscii() const
 {
     std::string asciiBoard = "";
@@ -118,7 +148,7 @@ void Board::parseFenPosition(std::string fenPosition)
 			Position position{rowIndex, colIndex};
 			int square = Utility::calculateSquareNumber(position);
 			setPieceBitboard(piece, color, getPieceBitboard(piece, color) | Bitboard(position));
-			loadPieceFromFen(piece, color, square); // Todo: Add validation in tests for the piece lists
+			loadPieceFromFen(piece, color, square);
 			colIndex++;
 		}
 	}
