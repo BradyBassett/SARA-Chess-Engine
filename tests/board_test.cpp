@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "../include/Board.hpp"
+#include "../include/Utility.hpp"
 
 struct BoardConstructorTestParams
 {
@@ -21,13 +22,38 @@ struct BoardConstructorTestParams
 	std::optional<Position> enPassantTargetSquare;
 };
 
-class BoardConstructorTest : public ::testing::TestWithParam<BoardConstructorTestParams> {};
+class BoardConstructorTest : public ::testing::TestWithParam<BoardConstructorTestParams>
+{
+protected:
+	bool verifyPieceListsPositionsWithBitboards(PieceList pieceList, Bitboard bitboard)
+	{
+		for (int square : pieceList.occupiedSquares)
+		{
+			Position position = Utility::calculatePosition(square);
+
+			if (!bitboard.getBit(position))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool verifyKingPositionWithBitboard(int kingSquare, Bitboard bitboard)
+	{
+		Position position = Utility::calculatePosition(kingSquare);
+
+		return bitboard.getBit(position);
+	}
+};
 
 TEST_P(BoardConstructorTest, BoardConstructor)
 {
 	auto params = GetParam();
 	Board board(params.fenPosition, params.fenEnPassantTargetSquare);
 
+	// Bitboards
 	EXPECT_EQ(board.getPieceBitboard(PieceType::PAWN, Color::WHITE), Bitboard(params.whitePawns));
 	EXPECT_EQ(board.getPieceBitboard(PieceType::PAWN, Color::BLACK), Bitboard(params.blackPawns));
 	EXPECT_EQ(board.getPieceBitboard(PieceType::KNIGHT, Color::WHITE), Bitboard(params.whiteKnights));
@@ -41,6 +67,36 @@ TEST_P(BoardConstructorTest, BoardConstructor)
 	EXPECT_EQ(board.getPieceBitboard(PieceType::KING, Color::WHITE), Bitboard(params.whiteKings));
 	EXPECT_EQ(board.getPieceBitboard(PieceType::KING, Color::BLACK), Bitboard(params.blackKings));
 
+	// Piece lists - Compares the number of pieces in the piece lists with the number of set bits in the bitboards
+	EXPECT_EQ(board.getPawns(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whitePawns));
+	EXPECT_EQ(board.getPawns(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackPawns));
+	EXPECT_EQ(board.getKnights(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whiteKnights));
+	EXPECT_EQ(board.getKnights(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackKnights));
+	EXPECT_EQ(board.getBishops(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whiteBishops));
+	EXPECT_EQ(board.getBishops(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackBishops));
+	EXPECT_EQ(board.getRooks(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whiteRooks));
+	EXPECT_EQ(board.getRooks(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackRooks));
+	EXPECT_EQ(board.getQueens(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whiteQueens));
+	EXPECT_EQ(board.getQueens(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackQueens));
+	// skip kings because there is only one king per color
+
+	// Piece lists - Compares the location of the pieces in the piece lists with the set bits in the bitboards
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getPawns(Color::WHITE), Bitboard(params.whitePawns)));
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getPawns(Color::BLACK), Bitboard(params.blackPawns)));
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getKnights(Color::WHITE), Bitboard(params.whiteKnights)));
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getKnights(Color::BLACK), Bitboard(params.blackKnights)));
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getBishops(Color::WHITE), Bitboard(params.whiteBishops)));
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getBishops(Color::BLACK), Bitboard(params.blackBishops)));
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getRooks(Color::WHITE), Bitboard(params.whiteRooks)));
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getRooks(Color::BLACK), Bitboard(params.blackRooks)));
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getQueens(Color::WHITE), Bitboard(params.whiteQueens)));
+	EXPECT_TRUE(verifyPieceListsPositionsWithBitboards(board.getQueens(Color::BLACK), Bitboard(params.blackQueens)));
+
+	// King positions
+	EXPECT_TRUE(verifyKingPositionWithBitboard(board.getKing(Color::WHITE), Bitboard(params.whiteKings)));
+	EXPECT_TRUE(verifyKingPositionWithBitboard(board.getKing(Color::BLACK), Bitboard(params.blackKings)));
+
+	// En passant target square
 	EXPECT_EQ(board.getEnPassantTargetSquare(), params.enPassantTargetSquare);
 }
 
