@@ -38,9 +38,19 @@ PieceList &Board::getPawns(Color color)
 	return pawns[static_cast<int>(color)];
 }
 
+void Board::setPawns(Color color, PieceList pawns)
+{
+	this->pawns[static_cast<int>(color)] = pawns;
+}
+
 PieceList &Board::getKnights(Color color)
 {
 	return knights[static_cast<int>(color)];
+}
+
+void Board::setKnights(Color color, PieceList knights)
+{
+	this->knights[static_cast<int>(color)] = knights;
 }
 
 PieceList &Board::getBishops(Color color)
@@ -48,9 +58,19 @@ PieceList &Board::getBishops(Color color)
 	return bishops[static_cast<int>(color)];
 }
 
+void Board::setBishops(Color color, PieceList bishops)
+{
+	this->bishops[static_cast<int>(color)] = bishops;
+}
+
 PieceList &Board::getRooks(Color color)
 {
 	return rooks[static_cast<int>(color)];
+}
+
+void Board::setRooks(Color color, PieceList rooks)
+{
+	this->rooks[static_cast<int>(color)] = rooks;
 }
 
 PieceList &Board::getQueens(Color color)
@@ -58,9 +78,19 @@ PieceList &Board::getQueens(Color color)
 	return queens[static_cast<int>(color)];
 }
 
+void Board::setQueens(Color color, PieceList queens)
+{
+	this->queens[static_cast<int>(color)] = queens;
+}
+
 int Board::getKing(Color color)
 {
 	return kings[static_cast<int>(color)];
+}
+
+void Board::setKing(Color color, int king)
+{
+	kings[static_cast<int>(color)] = king;
 }
 
 std::string Board::boardToAscii() const
@@ -101,6 +131,67 @@ std::string Board::boardToAscii() const
 	}
 
     return asciiBoard;
+}
+
+void Board::movePiece(Move move)
+{
+
+	// Clear the piece bitboard from the from square
+	Position from = move.getFrom();
+	PieceType piece = move.getPieceType();
+	Color color = move.getColor();
+	Bitboard pieceBitboard = getPieceBitboard(piece, color);
+	setPieceBitboard(piece, color, pieceBitboard & ~Bitboard(from));
+
+	// Set the piece bitboard on the to square
+	Position to = move.getTo();
+	if (move.getSpecialMove() == SpecialMove::PROMOTION)
+	{
+		switch (move.getPromotionPiece())
+		{
+			case PromotionPiece::QUEEN:
+				setPieceBitboard(PieceType::QUEEN, color, getPieceBitboard(PieceType::QUEEN, color) | Bitboard(to));
+				break;
+			case PromotionPiece::ROOK:
+				setPieceBitboard(PieceType::ROOK, color, getPieceBitboard(PieceType::ROOK, color) | Bitboard(to));
+				break;
+			case PromotionPiece::BISHOP:
+				setPieceBitboard(PieceType::BISHOP, color, getPieceBitboard(PieceType::BISHOP, color) | Bitboard(to));
+				break;
+			case PromotionPiece::KNIGHT:
+				setPieceBitboard(PieceType::KNIGHT, color, getPieceBitboard(PieceType::KNIGHT, color) | Bitboard(to));
+				break;
+			default:
+				break;
+		}
+	}
+	else
+	{
+		setPieceBitboard(piece, color, pieceBitboard | Bitboard(to));
+	}
+
+	// Update the piece list
+	updatePieceList(piece, color, Utility::calculateSquareNumber(from), Utility::calculateSquareNumber(to), false);
+
+	// Update the captured piece bitboard and remove the piece from the piece lists // TODO: Handle en passant
+	std::optional<PieceType> capturedPiece = move.getCapturedPiece();
+	if (capturedPiece.has_value())
+	{
+		Color capturedPieceColor = color == Color::WHITE ? Color::BLACK : Color::WHITE;
+		Bitboard capturedPieceBitboard = getPieceBitboard(capturedPiece.value(), capturedPieceColor);
+		setPieceBitboard(capturedPiece.value(), capturedPieceColor, capturedPieceBitboard & ~Bitboard(to));
+
+		updatePieceList(capturedPiece.value(), capturedPieceColor, Utility::calculateSquareNumber(from), Utility::calculateSquareNumber(to), true);
+	}
+
+	// Update the en passant target square
+	std::optional<Position> enPassantTargetSquare = move.getEnPassantTargetSquare();
+	if (enPassantTargetSquare.has_value())
+	{
+		setEnPassantTargetSquare(enPassantTargetSquare.value());
+	}
+
+	// TODO: Handle castling
 }
 
 void Board::initializePieceLists()
@@ -209,5 +300,56 @@ char Board::pieceToChar(PieceType piece, Color color) const
 		return color == Color::WHITE ? 'K' : 'k';
 	default:
 		return ' ';
+	}
+}
+
+void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool isCapture)
+{
+	PieceList* pieceList = nullptr;
+
+	switch (piece)
+	{
+		case PieceType::PAWN:
+		{
+			pieceList = &getPawns(color);
+			break;
+		}
+		case PieceType::KNIGHT:
+		{
+			pieceList = &getKnights(color);
+			break;
+		}
+		case PieceType::BISHOP:
+		{
+			pieceList = &getBishops(color);
+			break;
+		}
+		case PieceType::ROOK:
+		{
+			pieceList = &getRooks(color);
+			break;
+		}
+		case PieceType::QUEEN:
+		{
+			pieceList = &getQueens(color);
+			break;
+		}
+		case PieceType::KING:
+		{
+			// The king cannot be captured and therefore cant be removed from the piece list
+			if (!isCapture)
+			{
+				setKing(color, to);
+			}
+		}
+	}
+
+	if (isCapture)
+	{
+		pieceList->removePiece(to);
+	}
+	else
+	{
+		pieceList->movePiece(from, to);
 	}
 }

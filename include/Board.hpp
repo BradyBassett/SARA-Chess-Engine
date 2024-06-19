@@ -6,6 +6,7 @@
 #include <optional>
 
 #include "Bitboard.hpp"
+#include "Move.hpp"
 #include "enums/PieceType.hpp"
 #include "enums/Color.hpp"
 #include "structs/Position.hpp"
@@ -21,13 +22,20 @@ public:
 	std::optional<Position> getEnPassantTargetSquare() const;
 	void setEnPassantTargetSquare(Position enPassantTargetSquare);
 	PieceList &getPawns(Color color);
+	void setPawns(Color color, PieceList pawns);
 	PieceList &getKnights(Color color);
+	void setKnights(Color color, PieceList knights);
 	PieceList &getBishops(Color color);
+	void setBishops(Color color, PieceList bishops);
 	PieceList &getRooks(Color color);
+	void setRooks(Color color, PieceList rooks);
 	PieceList &getQueens(Color color);
+	void setQueens(Color color, PieceList queens);
 	int getKing(Color color);
+	void setKing(Color color, int king);
 
 	std::string boardToAscii() const;
+	void movePiece(Move move);
 
 private:
 	std::array<std::array<Bitboard, 6>, 2> pieceBitboards;
@@ -50,6 +58,7 @@ private:
 	void loadPieceFromFen(PieceType piece, Color color, int square);
 	void parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare);
 	char pieceToChar(PieceType piece, Color color) const;
+	void updatePieceList(PieceType piece, Color color, int from, int to, bool isCapture);
 };
 
 #endif // BOARD_HPP
