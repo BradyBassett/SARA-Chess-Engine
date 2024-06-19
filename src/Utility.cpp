@@ -1,4 +1,4 @@
-#include "Utility.hpp"
+#include "../include/Utility.hpp"
 #include <stdexcept>
 
 namespace Utility {
