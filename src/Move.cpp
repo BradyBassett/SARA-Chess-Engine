@@ -3,8 +3,8 @@
 
 Move::Move(Position from, Position to, PieceType pieceType, Color color,
 		   std::optional<PieceType> capturedPiece, std::optional<Position> enPassantTargetSquare,
-		   SpecialMove specialMove, CastleRights whiteCastleRights, CastleRights blackCastleRights,
-		   uint8_t halfMoveClock, uint16_t fullMoveNumber)
+		   SpecialMove specialMove, PromotionPiece promotionPiece, CastleRights whiteCastleRights,
+		   CastleRights blackCastleRights, uint8_t halfMoveClock, uint16_t fullMoveNumber)
 {
 	setFrom(from);
 	setTo(to);
@@ -13,6 +13,7 @@ Move::Move(Position from, Position to, PieceType pieceType, Color color,
 	setCapturedPiece(capturedPiece);
 	setEnPassantTargetSquare(enPassantTargetSquare);
 	setSpecialMove(specialMove);
+	setPromotionPiece(promotionPiece);
 	setWhiteCastleRights(whiteCastleRights);
 	setBlackCastleRights(blackCastleRights);
 	setHalfMoveClock(halfMoveClock);
@@ -148,6 +149,18 @@ SpecialMove Move::getSpecialMove() const
 void Move::setSpecialMove(SpecialMove specialMove)
 {
 	move = encode(SPECIAL_MOVE_MASK, SPECIAL_MOVE_SHIFT, static_cast<int>(specialMove));
+}
+
+PromotionPiece Move::getPromotionPiece() const
+{
+	int promotionPiece = decode(PROMOTION_PIECE_MASK, PROMOTION_PIECE_SHIFT);
+
+	return static_cast<PromotionPiece>(promotionPiece);
+}
+
+void Move::setPromotionPiece(PromotionPiece promotionPiece)
+{
+	move = encode(PROMOTION_PIECE_MASK, PROMOTION_PIECE_SHIFT, static_cast<int>(promotionPiece));
 }
 
 CastleRights Move::getWhiteCastleRights() const
