@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "../include/Game.hpp"
+#include "../include/Utility.hpp"
 
 int main();
 
@@ -37,8 +38,8 @@ int main()
 			continue;
 		}
 
-		Position fromPos = game.getBoard().convertStringToPosition(from);
-		Position toPos = game.getBoard().convertStringToPosition(to);
+		Position fromPos = Utility::convertStringToPosition(from);
+		Position toPos = Utility::convertStringToPosition(to);
 
 		try
 		{
