@@ -21,17 +21,19 @@ public:
 	void setPieceBitboard(PieceType piece, Color color, Bitboard bitboard);
 	std::optional<Position> getEnPassantTargetSquare() const;
 	void setEnPassantTargetSquare(Position enPassantTargetSquare);
-	PieceList &getPawns(Color color);
+	PieceList getPieceList(PieceType piece, Color color) const;
+	void setPieceList(PieceType piece, Color color, PieceList pieceList);
+	PieceList getPawns(Color color) const;
 	void setPawns(Color color, PieceList pawns);
-	PieceList &getKnights(Color color);
+	PieceList getKnights(Color color) const;
 	void setKnights(Color color, PieceList knights);
-	PieceList &getBishops(Color color);
+	PieceList getBishops(Color color) const;
 	void setBishops(Color color, PieceList bishops);
-	PieceList &getRooks(Color color);
+	PieceList getRooks(Color color) const;
 	void setRooks(Color color, PieceList rooks);
-	PieceList &getQueens(Color color);
+	PieceList getQueens(Color color) const;
 	void setQueens(Color color, PieceList queens);
-	int getKing(Color color);
+	int getKing(Color color) const;
 	void setKing(Color color, int king);
 
 	std::string boardToAscii() const;

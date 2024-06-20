@@ -33,7 +33,50 @@ void Board::setEnPassantTargetSquare(Position enPassantTargetSquare)
 	this->enPassantTargetSquare = enPassantTargetSquare;
 }
 
-PieceList &Board::getPawns(Color color)
+PieceList Board::getPieceList(PieceType piece, Color color) const
+{
+	switch (piece)
+	{
+		case PieceType::PAWN:
+			return getPawns(color);
+		case PieceType::KNIGHT:
+			return getKnights(color);
+		case PieceType::BISHOP:
+			return getBishops(color);
+		case PieceType::ROOK:
+			return getRooks(color);
+		case PieceType::QUEEN:
+			return getQueens(color);
+		default:
+			return PieceList(0);
+	}
+}
+
+void Board::setPieceList(PieceType piece, Color color, PieceList pieceList)
+{
+	switch (piece)
+	{
+		case PieceType::PAWN:
+			setPawns(color, pieceList);
+			break;
+		case PieceType::KNIGHT:
+			setKnights(color, pieceList);
+			break;
+		case PieceType::BISHOP:
+			setBishops(color, pieceList);
+			break;
+		case PieceType::ROOK:
+			setRooks(color, pieceList);
+			break;
+		case PieceType::QUEEN:
+			setQueens(color, pieceList);
+			break;
+		default:
+			break;
+	}
+}
+
+PieceList Board::getPawns(Color color) const
 {
 	return pawns[static_cast<int>(color)];
 }
@@ -43,7 +86,7 @@ void Board::setPawns(Color color, PieceList pawns)
 	this->pawns[static_cast<int>(color)] = pawns;
 }
 
-PieceList &Board::getKnights(Color color)
+PieceList Board::getKnights(Color color) const
 {
 	return knights[static_cast<int>(color)];
 }
@@ -53,7 +96,7 @@ void Board::setKnights(Color color, PieceList knights)
 	this->knights[static_cast<int>(color)] = knights;
 }
 
-PieceList &Board::getBishops(Color color)
+PieceList Board::getBishops(Color color) const
 {
 	return bishops[static_cast<int>(color)];
 }
@@ -63,7 +106,7 @@ void Board::setBishops(Color color, PieceList bishops)
 	this->bishops[static_cast<int>(color)] = bishops;
 }
 
-PieceList &Board::getRooks(Color color)
+PieceList Board::getRooks(Color color) const
 {
 	return rooks[static_cast<int>(color)];
 }
@@ -73,7 +116,7 @@ void Board::setRooks(Color color, PieceList rooks)
 	this->rooks[static_cast<int>(color)] = rooks;
 }
 
-PieceList &Board::getQueens(Color color)
+PieceList Board::getQueens(Color color) const
 {
 	return queens[static_cast<int>(color)];
 }
@@ -83,7 +126,7 @@ void Board::setQueens(Color color, PieceList queens)
 	this->queens[static_cast<int>(color)] = queens;
 }
 
-int Board::getKing(Color color)
+int Board::getKing(Color color) const
 {
 	return kings[static_cast<int>(color)];
 }
@@ -369,51 +412,25 @@ char Board::pieceToChar(PieceType piece, Color color) const
 
 void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool isCapture)
 {
-	PieceList* pieceList = nullptr;
-
-	switch (piece)
+	if (piece == PieceType::KING) // The king is not in the piece lists and therefore cannot be updated
 	{
-		case PieceType::PAWN:
-		{
-			pieceList = &getPawns(color);
-			break;
-		}
-		case PieceType::KNIGHT:
-		{
-			pieceList = &getKnights(color);
-			break;
-		}
-		case PieceType::BISHOP:
-		{
-			pieceList = &getBishops(color);
-			break;
-		}
-		case PieceType::ROOK:
-		{
-			pieceList = &getRooks(color);
-			break;
-		}
-		case PieceType::QUEEN:
-		{
-			pieceList = &getQueens(color);
-			break;
-		}
-		case PieceType::KING:
-		{
-			// The king cannot be captured and therefore cant be removed from the piece list
-			if (!isCapture)
+		if (!isCapture)
 			{
 				setKing(color, to);
 			}
-		}
 	}
+
+	PieceList pieceList = getPieceList(piece, color);
 
 	if (isCapture)
 	{
-		pieceList->removePiece(to);
+		pieceList.removePiece(to);
+
 	}
 	else
 	{
-		pieceList->movePiece(from, to);
+		pieceList.movePiece(from, to);
 	}
+
+	setPieceList(piece, color, pieceList);
 }
