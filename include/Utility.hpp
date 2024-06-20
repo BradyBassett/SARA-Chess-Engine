@@ -11,6 +11,7 @@ namespace Utility {
     void validatePosition(Position position);
     void validateSquareNumber(int squareNumber);
     Position convertStringToPosition(std::string str);
+    std::string convertPositionToString(Position position);
 }
 
 #endif // UTILITY_HPP
