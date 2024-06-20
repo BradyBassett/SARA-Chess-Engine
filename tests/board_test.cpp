@@ -68,16 +68,16 @@ TEST_P(BoardConstructorTest, BoardConstructor)
 	EXPECT_EQ(board.getPieceBitboard(PieceType::KING, Color::BLACK), Bitboard(params.blackKings));
 
 	// Piece lists - Compares the number of pieces in the piece lists with the number of set bits in the bitboards
-	EXPECT_EQ(board.getPawns(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whitePawns));
-	EXPECT_EQ(board.getPawns(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackPawns));
-	EXPECT_EQ(board.getKnights(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whiteKnights));
-	EXPECT_EQ(board.getKnights(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackKnights));
-	EXPECT_EQ(board.getBishops(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whiteBishops));
-	EXPECT_EQ(board.getBishops(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackBishops));
-	EXPECT_EQ(board.getRooks(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whiteRooks));
-	EXPECT_EQ(board.getRooks(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackRooks));
-	EXPECT_EQ(board.getQueens(Color::WHITE).occupiedSquares.size(), __builtin_popcountll(params.whiteQueens));
-	EXPECT_EQ(board.getQueens(Color::BLACK).occupiedSquares.size(), __builtin_popcountll(params.blackQueens));
+	EXPECT_EQ(board.getPawns(Color::WHITE).count, __builtin_popcountll(params.whitePawns));
+	EXPECT_EQ(board.getPawns(Color::BLACK).count, __builtin_popcountll(params.blackPawns));
+	EXPECT_EQ(board.getKnights(Color::WHITE).count, __builtin_popcountll(params.whiteKnights));
+	EXPECT_EQ(board.getKnights(Color::BLACK).count, __builtin_popcountll(params.blackKnights));
+	EXPECT_EQ(board.getBishops(Color::WHITE).count, __builtin_popcountll(params.whiteBishops));
+	EXPECT_EQ(board.getBishops(Color::BLACK).count, __builtin_popcountll(params.blackBishops));
+	EXPECT_EQ(board.getRooks(Color::WHITE).count, __builtin_popcountll(params.whiteRooks));
+	EXPECT_EQ(board.getRooks(Color::BLACK).count, __builtin_popcountll(params.blackRooks));
+	EXPECT_EQ(board.getQueens(Color::WHITE).count, __builtin_popcountll(params.whiteQueens));
+	EXPECT_EQ(board.getQueens(Color::BLACK).count, __builtin_popcountll(params.blackQueens));
 	// skip kings because there is only one king per color
 
 	// Piece lists - Compares the location of the pieces in the piece lists with the set bits in the bitboards
@@ -207,6 +207,8 @@ struct BoardMovePieceParams
 	Move move;
 	std::string expectedFenPosition;
 	std::string expectedFenEnPassantTargetSquare;
+	std::array<int, 5> expectedWhitePieces;
+	std::array<int, 5> expectedBlackPieces;
 };
 
 class BoardMovePieceTest : public ::testing::TestWithParam<BoardMovePieceParams> {};
@@ -218,39 +220,62 @@ TEST_P(BoardMovePieceTest, BoardMovePiece)
 
 	board.movePiece(params.move);
 
+	// Validate fen position and en passant target square - Also validates bitboards because getFenPosition() uses the bitboards
 	EXPECT_EQ(board.getFenPosition(), params.expectedFenPosition);
 	EXPECT_EQ(board.getFenEnPassantTargetSquare(), params.expectedFenEnPassantTargetSquare);
+
+	// Validate white piece counts
+	EXPECT_EQ(board.getPawns(Color::WHITE).count, params.expectedWhitePieces[0]);
+	EXPECT_EQ(board.getKnights(Color::WHITE).count, params.expectedWhitePieces[1]);
+	EXPECT_EQ(board.getBishops(Color::WHITE).count, params.expectedWhitePieces[2]);
+	EXPECT_EQ(board.getRooks(Color::WHITE).count, params.expectedWhitePieces[3]);
+	EXPECT_EQ(board.getQueens(Color::WHITE).count, params.expectedWhitePieces[4]);
+
+	// Validate black piece counts
+	EXPECT_EQ(board.getPawns(Color::BLACK).count, params.expectedBlackPieces[0]);
+	EXPECT_EQ(board.getKnights(Color::BLACK).count, params.expectedBlackPieces[1]);
+	EXPECT_EQ(board.getBishops(Color::BLACK).count, params.expectedBlackPieces[2]);
+	EXPECT_EQ(board.getRooks(Color::BLACK).count, params.expectedBlackPieces[3]);
+	EXPECT_EQ(board.getQueens(Color::BLACK).count, params.expectedBlackPieces[4]);
 }
 
-//TODO: Add test cases for promotion, castling, double pawn push, and en passant moves when those features are implemented
+// TODO: Add test cases for promotion, castling, double pawn push, and en passant moves when those features are implemented
 const auto boardMovePieceParams = ::testing::Values(
 	BoardMovePieceParams{
 		"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
 		"-",
 		Move{Position{6, 4}, Position{5, 4}, PieceType::PAWN, Color::WHITE, std::nullopt, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
 		"rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR",
-		"-"
+		"-",
+		{8, 2, 2, 2, 1},
+		{8, 2, 2, 2, 1}
 	},
 	BoardMovePieceParams{
 		"rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR",
 		"-",
 		Move{Position{0, 6}, Position{2, 5}, PieceType::KNIGHT, Color::BLACK, std::nullopt, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 2},
 		"rnbqkb1r/pppppppp/5n2/8/8/4P3/PPPP1PPP/RNBQKBNR",
-		"-"
+		"-",
+		{8, 2, 2, 2, 1},
+		{8, 2, 2, 2, 1}
 	},
 	BoardMovePieceParams{
 		"rnbqkb1r/pp1ppppp/5n2/2p5/3PP3/8/PPP2PPP/RNBQKBNR",
 		"-",
 		Move{Position{2, 5}, Position{4, 4}, PieceType::KNIGHT, Color::BLACK, PieceType::PAWN, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 3},
 		"rnbqkb1r/pp1ppppp/8/2p5/3Pn3/8/PPP2PPP/RNBQKBNR",
-		"-"
+		"-",
+		{7, 2, 2, 2, 1},
+		{8, 2, 2, 2, 1}
 	},
 	BoardMovePieceParams{
 		"rnbqkb1r/pp1ppppp/8/2p5/3Pn3/8/PPP2PPP/RNBQKBNR",
 		"-",
 		Move{Position{4, 3}, Position{3, 2}, PieceType::PAWN, Color::WHITE, PieceType::PAWN, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 4},
 		"rnbqkb1r/pp1ppppp/8/2P5/4n3/8/PPP2PPP/RNBQKBNR",
-		"-"
+		"-",
+		{7, 2, 2, 2, 1},
+		{7, 2, 2, 2, 1}
 	}
 );
 
