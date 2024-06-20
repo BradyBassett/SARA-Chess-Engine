@@ -35,16 +35,12 @@ public:
 	void setKing(Color color, int king);
 
 	std::string boardToAscii() const;
+	std::string getFenPosition() const;
+	std::string getFenEnPassantTargetSquare() const;
 	void movePiece(Move move);
 
 private:
 	std::array<std::array<Bitboard, 6>, 2> pieceBitboards;
-	std::array<std::array<Bitboard, 64>, 2> pawnAttackTable;
-	std::array<Bitboard, 64> knightAttackTable;
-	std::array<Bitboard, 64> bishopAttackTable;
-	std::array<Bitboard, 64> rookAttackTable;
-	std::array<Bitboard, 64> queenAttackTable;
-	std::array<Bitboard, 64> kingAttackTable;
 	std::optional<Position> enPassantTargetSquare;
 	std::array<PieceList, 2> pawns;
 	std::array<PieceList, 2> knights;

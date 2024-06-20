@@ -133,15 +133,80 @@ std::string Board::boardToAscii() const
     return asciiBoard;
 }
 
+std::string Board::getFenPosition() const
+{
+	std::string fenPosition = "";
+
+	for (int row = 0; row < 8; row++)
+	{
+		int emptySquares = 0;
+
+		for (int col = 0; col < 8; col++)
+		{
+			char pieceChar = ' ';
+			for (Color color : {Color::WHITE, Color::BLACK})
+			{
+				for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
+				{
+					if (getPieceBitboard(piece, color).getBit(Position{row, col}))
+					{
+						pieceChar = pieceToChar(piece, color);
+						break;
+					}
+				}
+				if (pieceChar != ' ') break;
+			}
+
+			if (pieceChar == ' ')
+			{
+				emptySquares++;
+			}
+			else
+			{
+				if (emptySquares > 0)
+				{
+					fenPosition += std::to_string(emptySquares);
+					emptySquares = 0;
+				}
+				fenPosition += pieceChar;
+			}
+		}
+
+		if (emptySquares > 0)
+		{
+			fenPosition += std::to_string(emptySquares);
+		}
+
+		if (row < 7)
+		{
+			fenPosition += "/";
+		}
+	}
+
+	return fenPosition;
+}
+
+std::string Board::getFenEnPassantTargetSquare() const
+{
+	if (enPassantTargetSquare.has_value())
+	{
+		return Utility::convertPositionToString(enPassantTargetSquare.value());
+	}
+	else
+	{
+		return "-";
+	}
+}
+
 void Board::movePiece(Move move)
 {
-
 	// Clear the piece bitboard from the from square
 	Position from = move.getFrom();
 	PieceType piece = move.getPieceType();
 	Color color = move.getColor();
 	Bitboard pieceBitboard = getPieceBitboard(piece, color);
 	setPieceBitboard(piece, color, pieceBitboard & ~Bitboard(from));
+
 
 	// Set the piece bitboard on the to square
 	Position to = move.getTo();
@@ -167,6 +232,7 @@ void Board::movePiece(Move move)
 	}
 	else
 	{
+		pieceBitboard = getPieceBitboard(piece, color);
 		setPieceBitboard(piece, color, pieceBitboard | Bitboard(to));
 	}
 
