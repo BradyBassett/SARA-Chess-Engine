@@ -204,8 +204,7 @@ void Board::movePiece(Move move)
 	Position from = move.getFrom();
 	PieceType piece = move.getPieceType();
 	Color color = move.getColor();
-	Bitboard pieceBitboard = getPieceBitboard(piece, color);
-	setPieceBitboard(piece, color, pieceBitboard & ~Bitboard(from));
+	setPieceBitboard(piece, color, getPieceBitboard(piece, color) & ~Bitboard(from));
 
 
 	// Set the piece bitboard on the to square
@@ -232,8 +231,7 @@ void Board::movePiece(Move move)
 	}
 	else
 	{
-		pieceBitboard = getPieceBitboard(piece, color);
-		setPieceBitboard(piece, color, pieceBitboard | Bitboard(to));
+		setPieceBitboard(piece, color, getPieceBitboard(piece, color) | Bitboard(to));
 	}
 
 	// Update the piece list
