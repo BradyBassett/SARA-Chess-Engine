@@ -172,3 +172,86 @@ const auto boardConstructorTestParams = ::testing::Values(
 );
 
 INSTANTIATE_TEST_CASE_P(Board, BoardConstructorTest, boardConstructorTestParams);
+
+struct BoardFenPartsParams
+{
+	std::string fenPosition;
+	std::string enPassantTargetSquare;
+};
+
+class BoardFenPartsTest : public ::testing::TestWithParam<BoardFenPartsParams> {};
+
+TEST_P(BoardFenPartsTest, BoardFenParts)
+{
+	auto params = GetParam();
+	Board board(params.fenPosition, params.enPassantTargetSquare);
+
+	EXPECT_EQ(board.getFenPosition(), params.fenPosition);
+	EXPECT_EQ(board.getFenEnPassantTargetSquare(), params.enPassantTargetSquare);
+}
+
+const auto boardFenPartsParams = ::testing::Values(
+	BoardFenPartsParams{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "-"},
+	BoardFenPartsParams{"1k5B/3p2pq/Qp1bb1PP/p1n1N1P1/1pP3Pp/N2RKp1r/P1B1Pp1P/1r2nR2", "-"},
+	BoardFenPartsParams{"2bq2k1/1p2br2/2p1p2p/2P3p1/2PPQpP1/3B1N1P/5P2/R5K1", "g3"},
+	BoardFenPartsParams{"5r1k/1b6/p3p2n/4q1p1/1p3N2/1P1B3Q/P1P5/1K4R1", "h3"},
+	BoardFenPartsParams{"5r1k/1b6/p3p2n/4q1p1/1p3N2/1P1B3Q/P1P5/1K4R1", "-"}
+);
+
+INSTANTIATE_TEST_CASE_P(Board, BoardFenPartsTest, boardFenPartsParams);
+
+struct BoardMovePieceParams
+{
+	std::string fenPosition;
+	std::string fenEnPassantTargetSquare;
+	Move move;
+	std::string expectedFenPosition;
+	std::string expectedFenEnPassantTargetSquare;
+};
+
+class BoardMovePieceTest : public ::testing::TestWithParam<BoardMovePieceParams> {};
+
+TEST_P(BoardMovePieceTest, BoardMovePiece)
+{
+	auto params = GetParam();
+	Board board(params.fenPosition, params.fenEnPassantTargetSquare);
+
+	board.movePiece(params.move);
+
+	EXPECT_EQ(board.getFenPosition(), params.expectedFenPosition);
+	EXPECT_EQ(board.getFenEnPassantTargetSquare(), params.expectedFenEnPassantTargetSquare);
+}
+
+//TODO: Add test cases for promotion, castling, double pawn push, and en passant moves when those features are implemented
+const auto boardMovePieceParams = ::testing::Values(
+	BoardMovePieceParams{
+		"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+		"-",
+		Move{Position{6, 4}, Position{5, 4}, PieceType::PAWN, Color::WHITE, std::nullopt, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR",
+		"-"
+	},
+	BoardMovePieceParams{
+		"rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR",
+		"-",
+		Move{Position{0, 6}, Position{2, 5}, PieceType::KNIGHT, Color::BLACK, std::nullopt, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 2},
+		"rnbqkb1r/pppppppp/5n2/8/8/4P3/PPPP1PPP/RNBQKBNR",
+		"-"
+	},
+	BoardMovePieceParams{
+		"rnbqkb1r/pp1ppppp/5n2/2p5/3PP3/8/PPP2PPP/RNBQKBNR",
+		"-",
+		Move{Position{2, 5}, Position{4, 4}, PieceType::KNIGHT, Color::BLACK, PieceType::PAWN, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 3},
+		"rnbqkb1r/pp1ppppp/8/2p5/3Pn3/8/PPP2PPP/RNBQKBNR",
+		"-"
+	},
+	BoardMovePieceParams{
+		"rnbqkb1r/pp1ppppp/8/2p5/3Pn3/8/PPP2PPP/RNBQKBNR",
+		"-",
+		Move{Position{4, 3}, Position{3, 2}, PieceType::PAWN, Color::WHITE, PieceType::PAWN, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 4},
+		"rnbqkb1r/pp1ppppp/8/2P5/4n3/8/PPP2PPP/RNBQKBNR",
+		"-"
+	}
+);
+
+INSTANTIATE_TEST_CASE_P(Board, BoardMovePieceTest, boardMovePieceParams);
