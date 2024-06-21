@@ -1,4 +1,5 @@
 #include "../include/Board.hpp"
+#include "../include/MoveGenerator.hpp"
 #include "../include/enums/PieceType.hpp"
 #include "../include/Utility.hpp"
 
@@ -7,6 +8,7 @@
 Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare)
 {
 	initializePieceLists();
+	initializeAttacks();
 	parseFenPosition(fenPosition);
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
 }
@@ -310,6 +312,23 @@ void Board::initializePieceLists()
 		bishops[color] = PieceList(10);
 		rooks[color] = PieceList(10);
 		queens[color] = PieceList(9);
+	}
+}
+
+void Board::initializeAttacks()
+{
+	for (int square = 0; square < 64; square++)
+	{
+		Position position = Utility::calculatePosition(square);
+
+		pawnAttacks[0][square] = MoveGenerator::generateAttacks(PieceType::PAWN, Color::WHITE, position);
+		pawnAttacks[1][square] = MoveGenerator::generateAttacks(PieceType::PAWN, Color::BLACK, position);
+
+		knightAttacks[square] = MoveGenerator::generateAttacks(PieceType::KNIGHT, Color::WHITE, position);
+		bishopAttacks[square] = MoveGenerator::generateAttacks(PieceType::BISHOP, Color::WHITE, position);
+		rookAttacks[square] = MoveGenerator::generateAttacks(PieceType::ROOK, Color::WHITE, position);
+		queenAttacks[square] = MoveGenerator::generateAttacks(PieceType::QUEEN, Color::WHITE, position);
+		kingAttacks[square] = MoveGenerator::generateAttacks(PieceType::KING, Color::WHITE, position);
 	}
 }
 
