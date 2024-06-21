@@ -50,8 +50,15 @@ private:
 	std::array<PieceList, 2> rooks;
 	std::array<PieceList, 2> queens;
 	std::array<int, 2> kings; // King is not a list because there can only be one king per color
+	std::array<std::array<Bitboard, 64>, 2> pawnAttacks; // Pawn attacks are different for each color
+	std::array<Bitboard, 64> knightAttacks;
+	std::array<Bitboard, 64> bishopAttacks;
+	std::array<Bitboard, 64> rookAttacks;
+	std::array<Bitboard, 64> queenAttacks;
+	std::array<Bitboard, 64> kingAttacks;
 
 	void initializePieceLists();
+	void initializeAttacks();
 	void parseFenPosition(std::string fenPosition);
 	void loadPieceFromFen(PieceType piece, Color color, int square);
 	void parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare);
