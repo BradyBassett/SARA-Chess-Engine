@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "../include/Move.hpp"
+#include "../include/Utility.hpp"
 #include "../include/structs/Position.hpp"
 #include "../include/structs/CastleRights.hpp"
 #include "../include/enums/Color.hpp"
@@ -49,7 +50,7 @@ TEST_P(MoveConstructorTest, MoveConstructor)
 }
 
 const auto moveConstructorTestParams = ::testing::Values(
-	MoveConstructorTestParams{Position{0, 0}, Position{0, 1}, PieceType::PAWN, Color::WHITE, std::nullopt, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+	MoveConstructorTestParams{Position{Utility::convertStringToPosition("a8")}, Position{Utility::convertStringToPosition("b8")}, PieceType::PAWN, Color::WHITE, std::nullopt, std::nullopt, SpecialMove::NONE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
 	MoveConstructorTestParams{Position{1, 5}, Position{4, 2}, PieceType::KNIGHT, Color::BLACK, std::nullopt, Position{1, 1}, SpecialMove::DOUBLE_PAWN_PUSH, PromotionPiece::NONE, CastleRights{false, true}, CastleRights{true, true}, 4, 10},
 	MoveConstructorTestParams{Position{7, 7}, Position{7, 6}, PieceType::BISHOP, Color::WHITE, PieceType::PAWN, std::nullopt, SpecialMove::EN_PASSANT, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{false, false}, 100, 1000},
 	MoveConstructorTestParams{Position{3, 3}, Position{3, 4}, PieceType::ROOK, Color::BLACK, PieceType::KNIGHT, Position{2, 4}, SpecialMove::KINGSIDE_CASTLE, PromotionPiece::NONE, CastleRights{true, false}, CastleRights{true, true}, 50, 5899},
