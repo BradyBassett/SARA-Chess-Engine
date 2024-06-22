@@ -153,6 +153,27 @@ void Board::setKing(Color color, int king)
 	kings[static_cast<int>(color)] = king;
 }
 
+Bitboard Board::getAttacks(PieceType piece, Color color, int square) const
+{
+	switch (piece)
+	{
+		case PieceType::PAWN:
+			return pawnAttacks[static_cast<int>(color)][square];
+		case PieceType::KNIGHT:
+			return knightAttacks[square];
+		case PieceType::BISHOP:
+			return bishopAttacks[square];
+		case PieceType::ROOK:
+			return rookAttacks[square];
+		case PieceType::QUEEN:
+			return queenAttacks[square];
+		case PieceType::KING:
+			return kingAttacks[square];
+		default:
+			return Bitboard(0);
+	}
+}
+
 std::string Board::boardToAscii() const
 {
     std::string asciiBoard = "";
