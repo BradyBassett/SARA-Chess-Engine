@@ -22,6 +22,69 @@ Bitboard MoveGenerator::generateAttacks(PieceType piece, Color color, Position p
 	}
 }
 
+Bitboard MoveGenerator::generatePotentialMoves(PieceType piece, Color color, Position position)
+{
+	switch (piece)
+	{
+	case PieceType::PAWN:
+		return generatePotentialPawnMoves(color, position);
+	case PieceType::KNIGHT:
+		return generateKnightAttacks(position);
+	case PieceType::BISHOP:
+	case PieceType::ROOK:
+	case PieceType::QUEEN:
+		return generateSlidingAttacks(piece, position);
+	case PieceType::KING:
+		return generatePotentialKingMoves(color, position);
+	default:
+		return 0;
+	}
+}
+
+Bitboard MoveGenerator::generatePotentialPawnMoves(Color color, Position position)
+{
+	Bitboard moves = generatePawnAttacks(color, position);
+
+	int direction = color == Color::WHITE ? -1 : 1;
+
+	Position singleMove{position.row + direction, position.col};
+	Position doubleMove{position.row + 2 * direction, position.col};
+
+	if (singleMove.row >= 0 && singleMove.row < 8 && singleMove.col >= 0 && singleMove.col < 8)
+	{
+		moves.setBit(singleMove);
+	}
+
+	if (canDoublePawnPush(color, position) && doubleMove.row >= 0 && doubleMove.row < 8 && doubleMove.col >= 0 && doubleMove.col < 8)
+	{
+		moves.setBit(doubleMove);
+	}
+
+	return moves;
+}
+
+Bitboard MoveGenerator::generatePotentialKingMoves(Color color, Position position)
+{
+	Bitboard moves = generateKingAttacks(position);
+
+	// Doesnt consider board state, only theoretically potential moves
+	if (position.col == 4)
+	{
+		if (position.row == 0 && color == Color::BLACK)
+		{
+			moves.setBit(Position{0, 6});
+			moves.setBit(Position{0, 2});
+		}
+		else if (position.row == 7 && color == Color::WHITE)
+		{
+			moves.setBit(Position{7, 6});
+			moves.setBit(Position{7, 2});
+		}
+	}
+
+	return moves;
+}
+
 Bitboard MoveGenerator::generatePawnAttacks(Color color, Position position)
 {
 	Bitboard attacks{0x0ULL};
@@ -125,4 +188,9 @@ Bitboard MoveGenerator::generateKingAttacks(Position position)
 	}
 
 	return attacks;
+}
+
+bool MoveGenerator::canDoublePawnPush(Color color, Position position)
+{
+	return (color == Color::WHITE && position.row == 6) || (color == Color::BLACK && position.row == 1);
 }

@@ -8,19 +8,19 @@
 class MoveGenerator
 {
 public:
-	// static Bitboard generateMoves();
-	static Bitboard generateAttacks(PieceType piece, Color color, Position position); // Color is only used for pawns
+	static Bitboard generatePotentialMoves(PieceType piece, Color color, Position position);
+	static Bitboard generateAttacks(PieceType piece, Color color, Position position);
 
 private:
-	// static Bitboard generatePotentialPawnMoves();
-	// static Bitboard generatePotentialKnightMoves();
-	// static Bitboard generatePotentialSlidingMoves();
-	// static Bitboard generatePotentialKingMoves();
+	static Bitboard generatePotentialPawnMoves(Color color, Position position);
+	static Bitboard generatePotentialKingMoves(Color color, Position position);
 
 	static Bitboard generatePawnAttacks(Color color, Position position);
 	static Bitboard generateKnightAttacks(Position position);
 	static Bitboard generateSlidingAttacks(PieceType piece, Position position);
 	static Bitboard generateKingAttacks(Position position);
+
+	static bool canDoublePawnPush(Color color, Position position);
 };
 
 #endif // MOVE_GENERATOR_HPP
