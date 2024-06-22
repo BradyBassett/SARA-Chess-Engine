@@ -19,6 +19,8 @@ public:
 
 	Bitboard getPieceBitboard(PieceType piece, Color color) const;
 	void setPieceBitboard(PieceType piece, Color color, Bitboard bitboard);
+	Bitboard getColorBitboard(Color color) const;
+	Bitboard getOccupiedBitboard() const;
 	std::optional<Position> getEnPassantTargetSquare() const;
 	void setEnPassantTargetSquare(Position enPassantTargetSquare);
 	PieceList getPieceList(PieceType piece, Color color) const;

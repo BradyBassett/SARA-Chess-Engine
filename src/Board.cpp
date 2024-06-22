@@ -23,6 +23,21 @@ void Board::setPieceBitboard(PieceType piece, Color color, Bitboard bitboard)
 	pieceBitboards[static_cast<int>(color)][static_cast<int>(piece)] = bitboard;
 }
 
+Bitboard Board::getColorBitboard(Color color) const
+{
+	Bitboard colorBitboard = Bitboard(0);
+	for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
+	{
+		colorBitboard |= getPieceBitboard(piece, color);
+	}
+	return colorBitboard;
+}
+
+Bitboard Board::getOccupiedBitboard() const
+{
+	return getColorBitboard(Color::WHITE) | getColorBitboard(Color::BLACK);
+}
+
 std::optional<Position> Board::getEnPassantTargetSquare() const
 {
 	return enPassantTargetSquare;
