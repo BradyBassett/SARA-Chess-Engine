@@ -21,7 +21,7 @@ void MoveValidator::validateMove(Position from, Position to, PieceType piece, Co
 	// Check if the from square is occupied by a piece of the correct color
 	if (game.getBoard().getColorBitboard(color).getBit(from) == 0)
 	{
-		throw std::invalid_argument("Invalid move - There is no piece at the from square");
+		throw std::invalid_argument("Invalid move - There is no piece on this square");
 	}
 
 	// Check if the to square is occupied by a piece of the same color
@@ -193,26 +193,17 @@ bool MoveValidator::isOrthogonal(Position from, Position to)
 
 void MoveValidator::validatePawnMove(Position from, Position to, PieceType piece, Color color, Game &game)
 {
-	// Check if the pawn is moving backwards
-	if ((color == Color::WHITE && to.row > from.row) || (color == Color::BLACK && to.row < from.row))
-	{
-		throw std::invalid_argument("Invalid move - Pawns cannot move backwards");
-	}
+	Color opponentColor = (color == Color::WHITE) ? Color::BLACK : Color::WHITE;
 
 	// Check direction
 	if (isDiagonal(from, to))
 	{
-		// check if the pawn is only moving diagonally one square
-		if (abs(to.col - from.col) != 1 || abs(to.row - from.row) != 1)
-		{
-			throw std::invalid_argument("Invalid move - Pawns can only move diagonally one square");
-		}
-
 		// Check if the pawn is capturing a piece
-		if (game.getBoard().getColorBitboard(color == Color::WHITE ? Color::BLACK : Color::WHITE).getBit(to) != 1)
+		if (game.getBoard().getColorBitboard(opponentColor).getBit(to) != 1)
 		{
 			// Check if the pawn is on an en passant eligible square
-			if (from.row == (color == Color::WHITE) ? 3 : 4)
+			int enPassantEligibleRow = (color == Color::WHITE) ? 3 : 4;
+			if (from.row == enPassantEligibleRow)
 			{
 				// if the en passant target square is not set or is not the to square, then the move is invalid
 				if (!game.getBoard().getEnPassantTargetSquare().has_value() || game.getBoard().getEnPassantTargetSquare().value() != to)
@@ -229,26 +220,9 @@ void MoveValidator::validatePawnMove(Position from, Position to, PieceType piece
 	}
 	else
 	{
-		if (game.getBoard().getColorBitboard(color).getBit(to) != 0)
+		if (game.getBoard().getColorBitboard(opponentColor).getBit(to) != 0)
 		{
 			throw std::invalid_argument("Invalid move - You cannot capture a piece by moving forward");
-		}
-
-		int singleRowIncrement = (color == Color::WHITE) ? -1 : 1;
-		int doubleRowIncrement = (color == Color::WHITE) ? -2 : 2;
-
-		if ((from.row + singleRowIncrement == to.row || from.row + doubleRowIncrement == to.row) && from.col == to.col)
-		{
-			int startRow = (color == Color::WHITE) ? 6 : 1;
-
-			if ((from.row + doubleRowIncrement == to.row) && (from.row != startRow))
-			{
-				throw std::invalid_argument("Invalid move - Pawns can only move two squares on their first move");
-			}
-		}
-		else
-		{
-			throw std::invalid_argument("Invalid move - Pawns can only move forward one square or two squares on their first move");
 		}
 	}
 }
