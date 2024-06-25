@@ -239,12 +239,6 @@ void MoveValidator::validateKingMove(Position from, Position to, PieceType piece
 	}
 	else
 	{
-		// Check if the king is moving more than one square
-		if (abs(from.row - to.row) > 1 || abs(from.col - to.col) > 1)
-		{
-			throw std::invalid_argument("Invalid move - Kings can only move one square in any direction");
-		}
-
 		// Check if the king is moving into check
 		if (isSquareAttacked(to, color, game))
 		{
@@ -256,22 +250,18 @@ void MoveValidator::validateKingMove(Position from, Position to, PieceType piece
 void MoveValidator::validateCastlingMove(Position from, Position to, Color color, Game &game)
 {
 	CastleRights castleRights = (color == Color::WHITE) ? game.getWhiteCastleRights() : game.getBlackCastleRights();
-	int rookCol = -1;
+	bool kingSide = castleRights.canCastleKingSide();
+	bool queenSide = castleRights.canCastleQueenSide();
 
-	if (castleRights.canCastleKingSide())
+	if (castleRights.canCastleKingSide() || castleRights.canCastleQueenSide())
 	{
-		rookCol = 7;
-	}
-	else if (castleRights.canCastleQueenSide())
-	{
-		rookCol = 0;
-	}
-
-	if (rookCol != -1)
-	{
-		if (!isValidRookPosition(Position{from.row, rookCol}, color, game))
+		if (!castleRights.canCastleKingSide() && to.col == 6)
 		{
-			throw std::invalid_argument("Invalid move - You cannot castle");
+			throw std::invalid_argument("Invalid move - The king cannot castle kingside");
+		}
+		if (!castleRights.canCastleQueenSide() && to.col == 2)
+		{
+			throw std::invalid_argument("Invalid move - The king cannot castle queenside");
 		}
 
 		// Check if the squares between the king and the rook are empty
@@ -294,16 +284,6 @@ void MoveValidator::validateCastlingMove(Position from, Position to, Color color
 	{
 		throw std::invalid_argument("Invalid move - You cannot castle");
 	}
-}
-
-bool MoveValidator::isValidRookPosition(Position from, Color color, Game &game)
-{
-	if (game.getBoard().getPieceBitboard(PieceType::ROOK, color).getBit(from) == 0)
-	{
-		return false;
-	}
-
-	return true;
 }
 
 bool MoveValidator::isSquareAttacked(Position position, Color color, Game &game)
