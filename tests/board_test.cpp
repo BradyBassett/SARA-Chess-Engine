@@ -239,8 +239,9 @@ TEST_P(BoardMovePieceTest, BoardMovePiece)
 	EXPECT_EQ(board.getQueens(Color::BLACK).count, params.expectedBlackPieces[4]);
 }
 
-// TODO: Add test cases for promotion, castling, double pawn push when those features are implemented
+// TODO: Add test cases for promotion when feature is implemented
 const auto boardMovePieceParams = ::testing::Values(
+	// Regular move
 	BoardMovePieceParams{
 		"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
 		"-",
@@ -259,6 +260,7 @@ const auto boardMovePieceParams = ::testing::Values(
 		{8, 2, 2, 2, 1},
 		{8, 2, 2, 2, 1}
 	},
+	// Regular capture
 	BoardMovePieceParams{
 		"rnbqkb1r/pp1ppppp/5n2/2p5/3PP3/8/PPP2PPP/RNBQKBNR",
 		"-",
@@ -277,6 +279,7 @@ const auto boardMovePieceParams = ::testing::Values(
 		{7, 2, 2, 2, 1},
 		{7, 2, 2, 2, 1}
 	},
+	// En passant
 	BoardMovePieceParams{
 		"rnbqkbnr/ppp2ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR",
 		"e6",
@@ -294,7 +297,55 @@ const auto boardMovePieceParams = ::testing::Values(
 		"-",
 		{6, 2, 2, 2, 1},
 		{6, 2, 2, 2, 1}
+	},
+	// Double pawn push
+	BoardMovePieceParams{
+		"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+		"-",
+		Move{Position{Utility::convertStringToPosition("e2")}, Position{Utility::convertStringToPosition("e4")}, PieceType::PAWN, Color::WHITE, std::nullopt, std::nullopt, SpecialMove::DOUBLE_PAWN_PUSH, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR",
+		"e3",
+		{8, 2, 2, 2, 1},
+		{8, 2, 2, 2, 1}
+	},
+	// Castling
+	BoardMovePieceParams{
+		"r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R",
+		"-",
+		Move{Position{Utility::convertStringToPosition("e1")}, Position{Utility::convertStringToPosition("g1")}, PieceType::KING, Color::WHITE, std::nullopt, std::nullopt, SpecialMove::KINGSIDE_CASTLE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R4RK1",
+		"-",
+		{8, 0, 0, 2, 0},
+		{8, 0, 0, 2, 0}
+	},
+	BoardMovePieceParams{
+		"r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R",
+		"-",
+		Move{Position{Utility::convertStringToPosition("e1")}, Position{Utility::convertStringToPosition("c1")}, PieceType::KING, Color::WHITE, std::nullopt, std::nullopt, SpecialMove::QUEENSIDE_CASTLE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"r3k2r/pppppppp/8/8/8/8/PPPPPPPP/2KR3R",
+		"-",
+		{8, 0, 0, 2, 0},
+		{8, 0, 0, 2, 0}
+	},
+	BoardMovePieceParams{
+		"r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R",
+		"-",
+		Move{Position{Utility::convertStringToPosition("e8")}, Position{Utility::convertStringToPosition("g8")}, PieceType::KING, Color::BLACK, std::nullopt, std::nullopt, SpecialMove::KINGSIDE_CASTLE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"r4rk1/pppppppp/8/8/8/8/PPPPPPPP/R3K2R",
+		"-",
+		{8, 0, 0, 2, 0},
+		{8, 0, 0, 2, 0}
+	},
+	BoardMovePieceParams{
+		"r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R",
+		"-",
+		Move{Position{Utility::convertStringToPosition("e8")}, Position{Utility::convertStringToPosition("c8")}, PieceType::KING, Color::BLACK, std::nullopt, std::nullopt, SpecialMove::QUEENSIDE_CASTLE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"2kr3r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQ",
+		"-",
+		{8, 0, 0, 2, 0},
+		{8, 0, 0, 2, 0}
 	}
+	// Promotion
 );
 
 INSTANTIATE_TEST_CASE_P(Board, BoardMovePieceTest, boardMovePieceParams);
