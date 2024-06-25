@@ -66,7 +66,7 @@ private:
 	void loadPieceFromFen(PieceType piece, Color color, int square);
 	void parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare);
 	char pieceToChar(PieceType piece, Color color) const;
-	void updatePieceList(PieceType piece, Color color, int from, int to, bool isCaptured);
+	void updatePieceList(PieceType piece, Color color, int from, int to, bool isRemoved);
 };
 
 #endif // BOARD_HPP
