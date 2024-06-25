@@ -59,21 +59,6 @@ CastleRights Game::getBlackCastleRights() const
 	return blackCastleRights;
 }
 
-void Game::switchActiveColor()
-{
-	activeColor == Color::WHITE ? activeColor = Color::BLACK : activeColor = Color::WHITE;
-}
-
-void Game::incrementHalfMoveClock()
-{
-	halfMoveClock++;
-}
-
-void Game::incrementFullMoveNumber()
-{
-	fullMoveNumber++;
-}
-
 std::vector<std::string> Game::getFenTokens(std::string fen)
 {
 	std::vector<std::string> parts;
@@ -118,4 +103,19 @@ void Game::parseCastlingRights(std::string castlingRights)
 
     whiteCastleRights = CastleRights{whiteCanCastleKingside, whiteCanCastleQueenside};
     blackCastleRights = CastleRights{blackCanCastleKingside, blackCanCastleQueenside};
+}
+
+void Game::switchActiveColor()
+{
+	activeColor == Color::WHITE ? activeColor = Color::BLACK : activeColor = Color::WHITE;
+}
+
+void Game::incrementHalfMoveClock()
+{
+	halfMoveClock++;
+}
+
+void Game::incrementFullMoveNumber()
+{
+	fullMoveNumber++;
 }

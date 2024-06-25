@@ -26,9 +26,7 @@ public:
 	CastleRights getWhiteCastleRights() const;
 	CastleRights getBlackCastleRights() const;
 
-	void switchActiveColor();
-	void incrementHalfMoveClock();
-	void incrementFullMoveNumber();
+	void makeMove(Position from, Position to, PromotionPiece promotionPiece);
 
 private:
 	Color activeColor;
@@ -45,6 +43,9 @@ private:
 	void parsehalfMoveClock(std::string halfMoveClock);
 	void parseFullMoveNumber(std::string fullMoveNumber);
 	void parseCastlingRights(std::string castlingRights);
+	void switchActiveColor();
+	void incrementHalfMoveClock();
+	void incrementFullMoveNumber();
 };
 
 #endif // GAME_HPP
