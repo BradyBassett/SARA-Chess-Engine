@@ -289,20 +289,46 @@ void Board::movePiece(Move move)
 	Position to = move.getTo();
 	if (move.getSpecialMove() == SpecialMove::PROMOTION)
 	{
+		// Remove the pawn from the piece list
+		PieceList pawns = getPawns(color);
+		pawns.removePiece(Utility::calculateSquareNumber(from));
+		setPawns(color, pawns);
+
+		// Add the promoted piece to the piece list and set the piece bitboard
 		switch (move.getPromotionPiece())
 		{
 			case PromotionPiece::QUEEN:
+			{
+				PieceList queens = getQueens(color);
+				queens.addPiece(Utility::calculateSquareNumber(to));
+				setQueens(color, queens);
 				setPieceBitboard(PieceType::QUEEN, color, getPieceBitboard(PieceType::QUEEN, color) | Bitboard(to));
 				break;
+			}
 			case PromotionPiece::ROOK:
+			{
+				PieceList rooks = getRooks(color);
+				rooks.addPiece(Utility::calculateSquareNumber(to));
+				setRooks(color, rooks);
 				setPieceBitboard(PieceType::ROOK, color, getPieceBitboard(PieceType::ROOK, color) | Bitboard(to));
 				break;
+			}
 			case PromotionPiece::BISHOP:
+			{
+				PieceList bishops = getBishops(color);
+				bishops.addPiece(Utility::calculateSquareNumber(to));
+				setBishops(color, bishops);
 				setPieceBitboard(PieceType::BISHOP, color, getPieceBitboard(PieceType::BISHOP, color) | Bitboard(to));
 				break;
+			}
 			case PromotionPiece::KNIGHT:
+			{
+				PieceList knights = getKnights(color);
+				knights.addPiece(Utility::calculateSquareNumber(to));
+				setKnights(color, knights);
 				setPieceBitboard(PieceType::KNIGHT, color, getPieceBitboard(PieceType::KNIGHT, color) | Bitboard(to));
 				break;
+			}
 			default:
 				break;
 		}
@@ -310,10 +336,8 @@ void Board::movePiece(Move move)
 	else
 	{
 		setPieceBitboard(piece, color, getPieceBitboard(piece, color) | Bitboard(to));
+		updatePieceList(piece, color, Utility::calculateSquareNumber(from), Utility::calculateSquareNumber(to), false);
 	}
-
-	// Update the piece list
-	updatePieceList(piece, color, Utility::calculateSquareNumber(from), Utility::calculateSquareNumber(to), false);
 
 	// Update the captured piece bitboard and remove the piece from the piece lists
 	std::optional<PieceType> capturedPiece = move.getCapturedPiece();
@@ -488,12 +512,12 @@ char Board::pieceToChar(PieceType piece, Color color) const
 	}
 }
 
-void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool isCaptured)
+void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool isRemoved)
 {
 	if (piece == PieceType::KING) // The king is not in the piece lists and therefore cannot be updated
 	{
-		// King cannot be captured so we only need to update the king's position
-		if (!isCaptured)
+		// King cannot be removed so we only need to update the king's position
+		if (!isRemoved)
 			{
 				setKing(color, to);
 			}
@@ -503,7 +527,7 @@ void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool
 
 	PieceList pieceList = getPieceList(piece, color);
 
-	if (isCaptured)
+	if (isRemoved)
 	{
 		pieceList.removePiece(to);
 	}
