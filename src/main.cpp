@@ -40,11 +40,28 @@ int main()
 
 		Position fromPos = Utility::convertStringToPosition(from);
 		Position toPos = Utility::convertStringToPosition(to);
+		PromotionPiece promotionPiece = PromotionPiece::NONE;
+		if (promotion == "q")
+		{
+			promotionPiece = PromotionPiece::QUEEN;
+		}
+		else if (promotion == "r")
+		{
+			promotionPiece = PromotionPiece::ROOK;
+		}
+		else if (promotion == "b")
+		{
+			promotionPiece = PromotionPiece::BISHOP;
+		}
+		else if (promotion == "n")
+		{
+			promotionPiece = PromotionPiece::KNIGHT;
+		}
 
 		try
 		{
 			std::system("clear");
-			// game.makeMove(fromPos, toPos, promotion);
+			game.makeMove(fromPos, toPos, promotionPiece);
 		}
 		catch (const std::exception &e)
 		{
