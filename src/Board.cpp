@@ -488,12 +488,12 @@ char Board::pieceToChar(PieceType piece, Color color) const
 	}
 }
 
-void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool isCapture)
+void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool isCaptured)
 {
 	if (piece == PieceType::KING) // The king is not in the piece lists and therefore cannot be updated
 	{
 		// King cannot be captured so we only need to update the king's position
-		if (!isCapture)
+		if (!isCaptured)
 			{
 				setKing(color, to);
 				return;
@@ -502,7 +502,7 @@ void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool
 
 	PieceList pieceList = getPieceList(piece, color);
 
-	if (isCapture)
+	if (isCaptured)
 	{
 		pieceList.removePiece(to);
 	}
