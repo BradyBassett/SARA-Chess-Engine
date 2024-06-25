@@ -496,8 +496,9 @@ void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool
 		if (!isCaptured)
 			{
 				setKing(color, to);
-				return;
 			}
+
+		return;
 	}
 
 	PieceList pieceList = getPieceList(piece, color);
