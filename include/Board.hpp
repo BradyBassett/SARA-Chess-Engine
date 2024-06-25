@@ -22,7 +22,7 @@ public:
 	Bitboard getColorBitboard(Color color) const;
 	Bitboard getOccupiedBitboard() const;
 	std::optional<Position> getEnPassantTargetSquare() const;
-	void setEnPassantTargetSquare(Position enPassantTargetSquare);
+	void setEnPassantTargetSquare(std::optional<Position> enPassantTargetSquare);
 	PieceList getPieceList(PieceType piece, Color color) const;
 	void setPieceList(PieceType piece, Color color, PieceList pieceList);
 	PieceList getPawns(Color color) const;

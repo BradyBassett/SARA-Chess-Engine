@@ -43,10 +43,8 @@ std::optional<Position> Board::getEnPassantTargetSquare() const
 	return enPassantTargetSquare;
 }
 
-void Board::setEnPassantTargetSquare(Position enPassantTargetSquare)
+void Board::setEnPassantTargetSquare(std::optional<Position> enPassantTargetSquare)
 {
-	Utility::validatePosition(enPassantTargetSquare);
-
 	this->enPassantTargetSquare = enPassantTargetSquare;
 }
 
@@ -287,7 +285,6 @@ void Board::movePiece(Move move)
 	Color color = move.getColor();
 	setPieceBitboard(piece, color, getPieceBitboard(piece, color) & ~Bitboard(from));
 
-
 	// Set the piece bitboard on the to square
 	Position to = move.getTo();
 	if (move.getSpecialMove() == SpecialMove::PROMOTION)
@@ -318,23 +315,31 @@ void Board::movePiece(Move move)
 	// Update the piece list
 	updatePieceList(piece, color, Utility::calculateSquareNumber(from), Utility::calculateSquareNumber(to), false);
 
-	// Update the captured piece bitboard and remove the piece from the piece lists // TODO: Handle en passant
+	// Update the captured piece bitboard and remove the piece from the piece lists
 	std::optional<PieceType> capturedPiece = move.getCapturedPiece();
 	if (capturedPiece.has_value())
 	{
 		Color capturedPieceColor = color == Color::WHITE ? Color::BLACK : Color::WHITE;
 		Bitboard capturedPieceBitboard = getPieceBitboard(capturedPiece.value(), capturedPieceColor);
-		setPieceBitboard(capturedPiece.value(), capturedPieceColor, capturedPieceBitboard & ~Bitboard(to));
 
-		updatePieceList(capturedPiece.value(), capturedPieceColor, Utility::calculateSquareNumber(from), Utility::calculateSquareNumber(to), true);
+		if (move.getSpecialMove() == SpecialMove::EN_PASSANT)
+		{
+			Position enPassantTargetSquare = move.getEnPassantTargetSquare().value();
+			Position capturedPiecePosition = Position{enPassantTargetSquare.row + (color == Color::WHITE ? 1 : -1), enPassantTargetSquare.col};
+			setPieceBitboard(capturedPiece.value(), capturedPieceColor, capturedPieceBitboard & ~Bitboard(capturedPiecePosition));
+			updatePieceList(capturedPiece.value(), capturedPieceColor, Utility::calculateSquareNumber(from), Utility::calculateSquareNumber(capturedPiecePosition), true);
+
+			// Clear the en passant target square
+			setEnPassantTargetSquare(std::nullopt);
+		}
+		else
+		{
+			setPieceBitboard(capturedPiece.value(), capturedPieceColor, capturedPieceBitboard & ~Bitboard(to));
+			updatePieceList(capturedPiece.value(), capturedPieceColor, Utility::calculateSquareNumber(from), Utility::calculateSquareNumber(to), true);
+		}
 	}
 
-	// Update the en passant target square
-	std::optional<Position> enPassantTargetSquare = move.getEnPassantTargetSquare();
-	if (enPassantTargetSquare.has_value())
-	{
-		setEnPassantTargetSquare(enPassantTargetSquare.value());
-	}
+	// TODO - Update the en passant target square on double pawn pushes
 
 	// TODO: Handle castling
 }
@@ -480,7 +485,6 @@ void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool
 	if (isCapture)
 	{
 		pieceList.removePiece(to);
-
 	}
 	else
 	{
