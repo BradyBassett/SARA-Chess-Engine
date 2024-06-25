@@ -340,12 +340,48 @@ const auto boardMovePieceParams = ::testing::Values(
 		"r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R",
 		"-",
 		Move{Position{Utility::convertStringToPosition("e8")}, Position{Utility::convertStringToPosition("c8")}, PieceType::KING, Color::BLACK, std::nullopt, std::nullopt, SpecialMove::QUEENSIDE_CASTLE, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
-		"2kr3r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQ",
+		"2kr3r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R",
 		"-",
 		{8, 0, 0, 2, 0},
 		{8, 0, 0, 2, 0}
-	}
+	},
 	// Promotion
+	BoardMovePieceParams{
+		"r1bqkbnr/pPpppppp/6n1/8/8/6N1/PpPPPPPP/R1BQKBNR",
+		"-",
+		Move{Position{Utility::convertStringToPosition("b7")}, Position{Utility::convertStringToPosition("b8")}, PieceType::PAWN, Color::WHITE, std::nullopt, std::nullopt, SpecialMove::PROMOTION, PromotionPiece::KNIGHT, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"rNbqkbnr/p1pppppp/6n1/8/8/6N1/PpPPPPPP/R1BQKBNR",
+		"-",
+		{7, 3, 2, 2, 1},
+		{8, 2, 2, 2, 1}
+	},
+	BoardMovePieceParams{
+		"r1bqkbnr/pPpppppp/6n1/8/8/6N1/PpPPPPPP/R1BQKBNR",
+		"-",
+		Move{Position{Utility::convertStringToPosition("b7")}, Position{Utility::convertStringToPosition("b8")}, PieceType::PAWN, Color::WHITE, std::nullopt, std::nullopt, SpecialMove::PROMOTION, PromotionPiece::BISHOP, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"rBbqkbnr/p1pppppp/6n1/8/8/6N1/PpPPPPPP/R1BQKBNR",
+		"-",
+		{7, 2, 3, 2, 1},
+		{8, 2, 2, 2, 1}
+	},
+	BoardMovePieceParams{
+		"r1bqkbnr/pPpppppp/6n1/8/8/6N1/PpPPPPPP/R1BQKBNR",
+		"-",
+		Move{Position{Utility::convertStringToPosition("b2")}, Position{Utility::convertStringToPosition("b1")}, PieceType::PAWN, Color::BLACK, std::nullopt, std::nullopt, SpecialMove::PROMOTION, PromotionPiece::ROOK, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"r1bqkbnr/pPpppppp/6n1/8/8/6N1/P1PPPPPP/RrBQKBNR",
+		"-",
+		{8, 2, 2, 2, 1},
+		{7, 2, 2, 3, 1}
+	},
+	BoardMovePieceParams{
+		"r1bqkbnr/pPpppppp/6n1/8/8/6N1/PpPPPPPP/R1BQKBNR",
+		"-",
+		Move{Position{Utility::convertStringToPosition("b2")}, Position{Utility::convertStringToPosition("b1")}, PieceType::PAWN, Color::BLACK, std::nullopt, std::nullopt, SpecialMove::PROMOTION, PromotionPiece::QUEEN, CastleRights{true, true}, CastleRights{true, true}, 0, 1},
+		"r1bqkbnr/pPpppppp/6n1/8/8/6N1/P1PPPPPP/RqBQKBNR",
+		"-",
+		{8, 2, 2, 2, 1},
+		{7, 2, 2, 2, 2}
+	}
 );
 
 INSTANTIATE_TEST_CASE_P(Board, BoardMovePieceTest, boardMovePieceParams);
