@@ -239,7 +239,6 @@ TEST_P(BoardMovePieceTest, BoardMovePiece)
 	EXPECT_EQ(board.getQueens(Color::BLACK).count, params.expectedBlackPieces[4]);
 }
 
-// TODO: Add test cases for promotion when feature is implemented
 const auto boardMovePieceParams = ::testing::Values(
 	// Regular move
 	BoardMovePieceParams{
