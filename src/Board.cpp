@@ -285,7 +285,7 @@ void Board::movePiece(Move move)
 	Color color = move.getColor();
 	setPieceBitboard(piece, color, getPieceBitboard(piece, color) & ~Bitboard(from));
 
-	// Set the piece bitboard on the to square
+	// Set the piece bitboard on the to square and update the piece list
 	Position to = move.getTo();
 	if (move.getSpecialMove() == SpecialMove::PROMOTION)
 	{
@@ -339,9 +339,27 @@ void Board::movePiece(Move move)
 		}
 	}
 
-	// TODO - Update the en passant target square on double pawn pushes
+	// Update the en passant target square on double pawn pushes
+	if (move.getSpecialMove() == SpecialMove::DOUBLE_PAWN_PUSH)
+	{
+		Position enPassantTargetSquare = Position{(to.row) + (color == Color::WHITE ? 1 : -1), from.col};
+		setEnPassantTargetSquare(enPassantTargetSquare);
+	}
 
-	// TODO: Handle castling
+	// Handle castling
+	if (move.getSpecialMove() == SpecialMove::KINGSIDE_CASTLE || move.getSpecialMove() == SpecialMove::QUEENSIDE_CASTLE)
+	{
+		// Move the appropriate rook
+		Position rookFrom = Position{from.row, (move.getSpecialMove() == SpecialMove::KINGSIDE_CASTLE ? 7 : 0)};
+		Position rookTo = Position{from.row, (move.getSpecialMove() == SpecialMove::KINGSIDE_CASTLE ? 5 : 3)};
+
+		// Clear the rook bitboard from the from square and set it on the to square
+		setPieceBitboard(PieceType::ROOK, color, getPieceBitboard(PieceType::ROOK, color) & ~Bitboard(rookFrom));
+		setPieceBitboard(PieceType::ROOK, color, getPieceBitboard(PieceType::ROOK, color) | Bitboard(rookTo));
+
+		// Update the rook piece list
+		updatePieceList(PieceType::ROOK, color, Utility::calculateSquareNumber(rookFrom), Utility::calculateSquareNumber(rookTo), false);
+	}
 }
 
 void Board::initializePieceLists()
@@ -474,9 +492,11 @@ void Board::updatePieceList(PieceType piece, Color color, int from, int to, bool
 {
 	if (piece == PieceType::KING) // The king is not in the piece lists and therefore cannot be updated
 	{
+		// King cannot be captured so we only need to update the king's position
 		if (!isCapture)
 			{
 				setKing(color, to);
+				return;
 			}
 	}
 
