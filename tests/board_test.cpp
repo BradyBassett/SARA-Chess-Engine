@@ -239,7 +239,7 @@ TEST_P(BoardMovePieceTest, BoardMovePiece)
 	EXPECT_EQ(board.getQueens(Color::BLACK).count, params.expectedBlackPieces[4]);
 }
 
-// TODO: Add test cases for promotion, castling, double pawn push, and en passant moves when those features are implemented
+// TODO: Add test cases for promotion, castling, double pawn push when those features are implemented
 const auto boardMovePieceParams = ::testing::Values(
 	BoardMovePieceParams{
 		"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
@@ -276,6 +276,24 @@ const auto boardMovePieceParams = ::testing::Values(
 		"-",
 		{7, 2, 2, 2, 1},
 		{7, 2, 2, 2, 1}
+	},
+	BoardMovePieceParams{
+		"rnbqkbnr/ppp2ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR",
+		"e6",
+		Move{Position{Utility::convertStringToPosition("d5")}, Position{Utility::convertStringToPosition("e6")}, PieceType::PAWN, Color::WHITE, PieceType::PAWN, Utility::convertStringToPosition("e6"), SpecialMove::EN_PASSANT, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 3},
+		"rnbqkbnr/ppp2ppp/4P3/8/8/8/PPPP1PPP/RNBQKBNR",
+		"-",
+		{8, 2, 2, 2, 1},
+		{6, 2, 2, 2, 1}
+	},
+	BoardMovePieceParams{
+		"rnbqkbnr/ppp3pp/8/8/4pP1P/8/PPPP2P1/RNBQKBNR",
+		"f3",
+		Move{Position{Utility::convertStringToPosition("e4")}, Position{Utility::convertStringToPosition("f3")}, PieceType::PAWN, Color::BLACK, PieceType::PAWN, Utility::convertStringToPosition("f3"), SpecialMove::EN_PASSANT, PromotionPiece::NONE, CastleRights{true, true}, CastleRights{true, true}, 0, 6},
+		"rnbqkbnr/ppp3pp/8/8/7P/5p2/PPPP2P1/RNBQKBNR",
+		"-",
+		{6, 2, 2, 2, 1},
+		{6, 2, 2, 2, 1}
 	}
 );
 
