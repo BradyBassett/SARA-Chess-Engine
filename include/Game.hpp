@@ -36,6 +36,8 @@ private:
 	uint16_t fullMoveNumber;
 	CastleRights whiteCastleRights;
 	CastleRights blackCastleRights;
+	bool cachedInCheckValue;
+	bool hasCachedInCheckValue;
 
 	std::vector<std::string> getFenTokens(std::string fen);
 	void parseActiveColor(std::string color);
@@ -50,6 +52,8 @@ private:
 	SpecialMove getSpecialMove(PieceType piece, Position from, Position to, std::optional<PieceType> capturedPiece, PromotionPiece promotionPiece);
 	std::optional<Position> getEnPassantTargetSquare(PieceType piece, Position from, Position to, SpecialMove specialMove);
 	void updateCastlingRights(PieceType piece, Color color, Position from);
+	bool isInCheck();
+	bool calculateInCheck();
 };
 
 #endif // GAME_HPP
