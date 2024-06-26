@@ -172,6 +172,22 @@ Bitboard Board::getAttacks(PieceType piece, Color color, int square) const
 	}
 }
 
+std::optional<PieceType> Board::getPiece(Position position) const
+{
+	for (Color color : {Color::WHITE, Color::BLACK})
+	{
+		for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
+		{
+			if (getPieceBitboard(piece, color).getBit(position))
+			{
+				return piece;
+			}
+		}
+	}
+
+	return std::nullopt;
+}
+
 std::string Board::boardToAscii() const
 {
     std::string asciiBoard = "";
