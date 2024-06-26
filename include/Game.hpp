@@ -32,7 +32,6 @@ private:
 	Color activeColor;
 	Board board;
 	std::vector<Move> moveHistory;
-	std::unordered_map<std::string, int> gameStateHistory;
 	uint8_t halfMoveClock;
 	uint16_t fullMoveNumber;
 	CastleRights whiteCastleRights;
@@ -46,6 +45,11 @@ private:
 	void switchActiveColor();
 	void incrementHalfMoveClock();
 	void incrementFullMoveNumber();
+	void addMoveToHistory(Move move);
+	std::optional<PieceType> getCapturedPiece(PieceType piece, Position from, Position to);
+	SpecialMove getSpecialMove(PieceType piece, Position from, Position to, std::optional<PieceType> capturedPiece, PromotionPiece promotionPiece);
+	std::optional<Position> getEnPassantTargetSquare(PieceType piece, Position from, Position to, SpecialMove specialMove);
+	void updateCastlingRights(PieceType piece, Color color, Position from);
 };
 
 #endif // GAME_HPP

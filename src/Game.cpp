@@ -1,4 +1,5 @@
 #include "../include/Game.hpp"
+#include "../include/MoveValidator.hpp"
 
 #include <sstream>
 
@@ -59,6 +60,51 @@ CastleRights Game::getBlackCastleRights() const
 	return blackCastleRights;
 }
 
+// Todo: eventually add support for check
+void Game::makeMove(Position from, Position to, PromotionPiece promotionPiece)
+{
+	if (!board.getPiece(from).has_value())
+	{
+		throw std::invalid_argument("No piece at the from position");
+	}
+
+	// Validate move
+	PieceType piece = board.getPiece(from).value();
+	Color color = getActiveColor();
+	MoveValidator::validateMove(from, to, piece, color, *this);
+
+	// Get move details
+	std::optional<PieceType> capturedPiece = getCapturedPiece(piece, from, to);
+	SpecialMove specialMove = getSpecialMove(piece, from, to, capturedPiece, promotionPiece);
+	std::optional<Position> enPassantTargetSquare = getEnPassantTargetSquare(piece, from, to, specialMove);
+	Move move = Move(from, to, piece, color, capturedPiece, enPassantTargetSquare, specialMove, promotionPiece, getWhiteCastleRights(), getBlackCastleRights(), getHalfMoveClock(), getFullMoveNumber());
+	addMoveToHistory(move);
+
+	// Move piece
+	board.movePiece(move);
+
+	// Update castling rights
+	updateCastlingRights(piece, color, from);
+
+	// Reset half move clock if a pawn is moved or a piece is captured
+	if (capturedPiece.has_value() || piece == PieceType::PAWN)
+	{
+		setHalfMoveClock(0);
+	}
+	else
+	{
+		incrementHalfMoveClock();
+	}
+
+	// Increment full move number if black moves
+	if (color == Color::BLACK)
+	{
+		incrementFullMoveNumber();
+	}
+
+	switchActiveColor();
+}
+
 std::vector<std::string> Game::getFenTokens(std::string fen)
 {
 	std::vector<std::string> parts;
@@ -96,13 +142,13 @@ void Game::parseFullMoveNumber(std::string fullMoveNumber)
 
 void Game::parseCastlingRights(std::string castlingRights)
 {
-    bool whiteCanCastleKingside = castlingRights.find('K') != std::string::npos;
-    bool whiteCanCastleQueenside = castlingRights.find('Q') != std::string::npos;
-    bool blackCanCastleKingside = castlingRights.find('k') != std::string::npos;
-    bool blackCanCastleQueenside = castlingRights.find('q') != std::string::npos;
+	bool whiteCanCastleKingside = castlingRights.find('K') != std::string::npos;
+	bool whiteCanCastleQueenside = castlingRights.find('Q') != std::string::npos;
+	bool blackCanCastleKingside = castlingRights.find('k') != std::string::npos;
+	bool blackCanCastleQueenside = castlingRights.find('q') != std::string::npos;
 
-    whiteCastleRights = CastleRights{whiteCanCastleKingside, whiteCanCastleQueenside};
-    blackCastleRights = CastleRights{blackCanCastleKingside, blackCanCastleQueenside};
+	whiteCastleRights = CastleRights{whiteCanCastleKingside, whiteCanCastleQueenside};
+	blackCastleRights = CastleRights{blackCanCastleKingside, blackCanCastleQueenside};
 }
 
 void Game::switchActiveColor()
@@ -118,4 +164,121 @@ void Game::incrementHalfMoveClock()
 void Game::incrementFullMoveNumber()
 {
 	fullMoveNumber++;
+}
+
+void Game::addMoveToHistory(Move move)
+{
+	moveHistory.push_back(move);
+}
+
+std::optional<PieceType> Game::getCapturedPiece(PieceType piece, Position from, Position to)
+{
+	// Regular capture
+	if (board.getPiece(to).has_value())
+	{
+		return board.getPiece(to);
+	}
+	// En passant capture
+	else if (piece == PieceType::PAWN && abs(from.row - to.row) == 1 && abs(from.col - to.col) == 1 && !board.getPiece(to).has_value())
+	{
+		return PieceType::PAWN;
+	}
+	// No capture
+	else
+	{
+		return std::nullopt;
+	}
+}
+
+std::optional<Position> Game::getEnPassantTargetSquare(PieceType piece, Position from, Position to, SpecialMove specialMove)
+{
+	if (specialMove == SpecialMove::DOUBLE_PAWN_PUSH)
+	{
+		return Position{(from.row + to.row) / 2, from.col};
+	}
+	else
+	{
+		return std::nullopt;
+	}
+}
+
+SpecialMove Game::getSpecialMove(PieceType piece, Position from, Position to, std::optional<PieceType> capturedPiece, PromotionPiece promotionPiece)
+{
+	// Double Pawn Push
+	if (piece == PieceType::PAWN && abs(from.row - to.row) == 2)
+	{
+		return SpecialMove::DOUBLE_PAWN_PUSH;
+	}
+	// En Passant
+	else if (getBoard().getEnPassantTargetSquare().has_value() && capturedPiece.has_value() && capturedPiece.value() == PieceType::PAWN && piece == PieceType::PAWN && abs(from.col - to.col) == 1 && abs(from.row - to.row) == 1)
+	{
+		return SpecialMove::EN_PASSANT;
+	}
+	// Castling
+	else if (piece == PieceType::KING && abs(from.col - to.col) == 2 && from.row == to.row)
+	{
+		// Kingside Castle
+		if (to.col == 6)
+		{
+			return SpecialMove::KINGSIDE_CASTLE;
+		}
+		// Queenside Castle
+		else if (to.col == 2)
+		{
+			return SpecialMove::QUEENSIDE_CASTLE;
+		}
+	}
+	// Promotion
+	else if (promotionPiece != PromotionPiece::NONE)
+	{
+		return SpecialMove::PROMOTION;
+	}
+	// No special move
+	else
+	{
+		return SpecialMove::NONE;
+	}
+}
+
+void Game::updateCastlingRights(PieceType piece, Color color, Position from)
+{
+	// Update castling rights if king moves from starting position
+	if (piece == PieceType::KING && (from == Position{0, 4} || from == Position{7, 4}))
+	{
+		if (color == Color::WHITE)
+		{
+			whiteCastleRights.disable();
+		}
+		else
+		{
+			blackCastleRights.disable();
+		}
+	}
+
+	// Update castling rights if rook moves from starting position
+	if (piece == PieceType::ROOK && (from == Position{0, 0} || from == Position{0, 7} || from == Position{7, 0} || from == Position{7, 7}))
+	{
+		if (from.col == 0)
+		{
+			if (color == Color::WHITE)
+			{
+				whiteCastleRights.disableQueenSide();
+			}
+			else
+			{
+				blackCastleRights.disableQueenSide();
+			}
+		}
+		else if (from.col == 7)
+		{
+			if (color == Color::WHITE)
+			{
+				whiteCastleRights.disableKingSide();
+			}
+			else
+			{
+				blackCastleRights.disableKingSide();
+			}
+		}
+	}
 }
