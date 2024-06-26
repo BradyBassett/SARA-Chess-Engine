@@ -234,10 +234,8 @@ SpecialMove Game::getSpecialMove(PieceType piece, Position from, Position to, st
 		return SpecialMove::PROMOTION;
 	}
 	// No special move
-	else
-	{
-		return SpecialMove::NONE;
-	}
+
+	return SpecialMove::NONE;
 }
 
 void Game::updateCastlingRights(PieceType piece, Color color, Position from)
