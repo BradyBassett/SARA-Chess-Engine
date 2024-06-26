@@ -63,44 +63,42 @@ CastleRights Game::getBlackCastleRights() const
 // Todo: eventually add support for check
 void Game::makeMove(Position from, Position to, PromotionPiece promotionPiece)
 {
-	Color color = getActiveColor();
-
-	if (!board.getPiece(from, color).has_value())
+	if (!board.getPiece(from, activeColor).has_value())
 	{
 		throw std::invalid_argument("No piece at the from position");
 	}
 
 	// Validate move
-	PieceType piece = board.getPiece(from, color).value();
-	MoveValidator::validateMove(from, to, piece, color, *this);
+	PieceType piece = board.getPiece(from, activeColor).value();
+	MoveValidator::validateMove(from, to, piece, activeColor, *this);
 
 	// Get move details
 	std::optional<PieceType> capturedPiece = getCapturedPiece(piece, from, to);
 	SpecialMove specialMove = getSpecialMove(piece, from, to, capturedPiece, promotionPiece);
 	std::optional<Position> enPassantTargetSquare = getEnPassantTargetSquare(piece, from, to, specialMove);
-	Move move = Move(from, to, piece, color, capturedPiece, enPassantTargetSquare, specialMove, promotionPiece, getWhiteCastleRights(), getBlackCastleRights(), getHalfMoveClock(), getFullMoveNumber());
+	Move move = Move(from, to, piece, activeColor, capturedPiece, enPassantTargetSquare, specialMove, promotionPiece, whiteCastleRights, blackCastleRights, halfMoveClock, fullMoveNumber);
 	addMoveToHistory(move);
 
 	// Move piece
 	board.movePiece(move);
 
 	// Update castling rights
-	updateCastlingRights(piece, color, from);
+	updateCastlingRights(piece, activeColor, from);
 
 	// Reset half move clock if a pawn is moved or a piece is captured
 	if (capturedPiece.has_value() || piece == PieceType::PAWN)
 	{
-		setHalfMoveClock(0);
+		halfMoveClock = 0;
 	}
 	else
 	{
-		incrementHalfMoveClock();
+		halfMoveClock++;
 	}
 
 	// Increment full move number if black moves
-	if (color == Color::BLACK)
+	if (activeColor == Color::BLACK)
 	{
-		incrementFullMoveNumber();
+		fullMoveNumber++;
 	}
 
 	switchActiveColor();
@@ -174,7 +172,7 @@ void Game::addMoveToHistory(Move move)
 
 std::optional<PieceType> Game::getCapturedPiece(PieceType piece, Position from, Position to)
 {
-	Color opponentColor = (getActiveColor() == Color::WHITE) ? Color::BLACK : Color::WHITE;
+	Color opponentColor = (activeColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
 
 	// Regular capture
 	if (board.getPiece(to, opponentColor).has_value())
