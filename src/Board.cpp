@@ -300,45 +300,36 @@ void Board::movePiece(Move move)
 
 	// Set the piece bitboard on the to square and update the piece list
 	Position to = move.getTo();
-	if (move.getSpecialMove() == SpecialMove::PROMOTION)
+	SpecialMove specialMove = move.getSpecialMove();
+	if (specialMove == SpecialMove::PROMOTION)
 	{
 		// Remove the pawn from the piece list
-		PieceList pawns = getPawns(color);
-		pawns.removePiece(Utility::calculateSquareNumber(from));
-		setPawns(color, pawns);
+		pawns[static_cast<int>(color)].removePiece(Utility::calculateSquareNumber(from));
 
 		// Add the promoted piece to the piece list and set the piece bitboard
 		switch (move.getPromotionPiece())
 		{
 			case PromotionPiece::QUEEN:
 			{
-				PieceList queens = getQueens(color);
-				queens.addPiece(Utility::calculateSquareNumber(to));
-				setQueens(color, queens);
+				queens[static_cast<int>(color)].addPiece(Utility::calculateSquareNumber(to));
 				setPieceBitboard(PieceType::QUEEN, color, getPieceBitboard(PieceType::QUEEN, color) | Bitboard(to));
 				break;
 			}
 			case PromotionPiece::ROOK:
 			{
-				PieceList rooks = getRooks(color);
-				rooks.addPiece(Utility::calculateSquareNumber(to));
-				setRooks(color, rooks);
+				rooks[static_cast<int>(color)].addPiece(Utility::calculateSquareNumber(to));
 				setPieceBitboard(PieceType::ROOK, color, getPieceBitboard(PieceType::ROOK, color) | Bitboard(to));
 				break;
 			}
 			case PromotionPiece::BISHOP:
 			{
-				PieceList bishops = getBishops(color);
-				bishops.addPiece(Utility::calculateSquareNumber(to));
-				setBishops(color, bishops);
+				bishops[static_cast<int>(color)].addPiece(Utility::calculateSquareNumber(to));
 				setPieceBitboard(PieceType::BISHOP, color, getPieceBitboard(PieceType::BISHOP, color) | Bitboard(to));
 				break;
 			}
 			case PromotionPiece::KNIGHT:
 			{
-				PieceList knights = getKnights(color);
-				knights.addPiece(Utility::calculateSquareNumber(to));
-				setKnights(color, knights);
+				knights[static_cast<int>(color)].addPiece(Utility::calculateSquareNumber(to));
 				setPieceBitboard(PieceType::KNIGHT, color, getPieceBitboard(PieceType::KNIGHT, color) | Bitboard(to));
 				break;
 			}
@@ -359,7 +350,7 @@ void Board::movePiece(Move move)
 		Color capturedPieceColor = color == Color::WHITE ? Color::BLACK : Color::WHITE;
 		Bitboard capturedPieceBitboard = getPieceBitboard(capturedPiece.value(), capturedPieceColor);
 
-		if (move.getSpecialMove() == SpecialMove::EN_PASSANT)
+		if (specialMove == SpecialMove::EN_PASSANT)
 		{
 			Position enPassantTargetSquare = move.getEnPassantTargetSquare().value();
 			Position capturedPiecePosition = Position{enPassantTargetSquare.row + (color == Color::WHITE ? 1 : -1), enPassantTargetSquare.col};
@@ -377,18 +368,18 @@ void Board::movePiece(Move move)
 	}
 
 	// Update the en passant target square on double pawn pushes
-	if (move.getSpecialMove() == SpecialMove::DOUBLE_PAWN_PUSH)
+	if (specialMove == SpecialMove::DOUBLE_PAWN_PUSH)
 	{
 		Position enPassantTargetSquare = Position{(to.row) + (color == Color::WHITE ? 1 : -1), from.col};
 		setEnPassantTargetSquare(enPassantTargetSquare);
 	}
 
 	// Handle castling
-	if (move.getSpecialMove() == SpecialMove::KINGSIDE_CASTLE || move.getSpecialMove() == SpecialMove::QUEENSIDE_CASTLE)
+	if (specialMove == SpecialMove::KINGSIDE_CASTLE || specialMove == SpecialMove::QUEENSIDE_CASTLE)
 	{
 		// Move the appropriate rook
-		Position rookFrom = Position{from.row, (move.getSpecialMove() == SpecialMove::KINGSIDE_CASTLE ? 7 : 0)};
-		Position rookTo = Position{from.row, (move.getSpecialMove() == SpecialMove::KINGSIDE_CASTLE ? 5 : 3)};
+		Position rookFrom = Position{from.row, (specialMove == SpecialMove::KINGSIDE_CASTLE ? 7 : 0)};
+		Position rookTo = Position{from.row, (specialMove == SpecialMove::KINGSIDE_CASTLE ? 5 : 3)};
 
 		// Clear the rook bitboard from the from square and set it on the to square
 		setPieceBitboard(PieceType::ROOK, color, getPieceBitboard(PieceType::ROOK, color) & ~Bitboard(rookFrom));
