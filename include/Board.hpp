@@ -38,7 +38,7 @@ public:
 	int getKing(Color color) const;
 	void setKing(Color color, int king);
 	Bitboard getAttacks(PieceType piece, Color color, int square) const;
-	std::optional<PieceType> getPiece(Position position) const;
+	std::optional<PieceType> getPiece(Position position, Color color) const;
 
 	std::string boardToAscii() const;
 	std::string getFenPosition() const;

@@ -63,14 +63,15 @@ CastleRights Game::getBlackCastleRights() const
 // Todo: eventually add support for check
 void Game::makeMove(Position from, Position to, PromotionPiece promotionPiece)
 {
-	if (!board.getPiece(from).has_value())
+	Color color = getActiveColor();
+
+	if (!board.getPiece(from, color).has_value())
 	{
 		throw std::invalid_argument("No piece at the from position");
 	}
 
 	// Validate move
-	PieceType piece = board.getPiece(from).value();
-	Color color = getActiveColor();
+	PieceType piece = board.getPiece(from, color).value();
 	MoveValidator::validateMove(from, to, piece, color, *this);
 
 	// Get move details
@@ -173,13 +174,15 @@ void Game::addMoveToHistory(Move move)
 
 std::optional<PieceType> Game::getCapturedPiece(PieceType piece, Position from, Position to)
 {
+	Color opponentColor = (getActiveColor() == Color::WHITE) ? Color::BLACK : Color::WHITE;
+
 	// Regular capture
-	if (board.getPiece(to).has_value())
+	if (board.getPiece(to, opponentColor).has_value())
 	{
-		return board.getPiece(to);
+		return board.getPiece(to, opponentColor);
 	}
 	// En passant capture
-	else if (piece == PieceType::PAWN && abs(from.row - to.row) == 1 && abs(from.col - to.col) == 1 && !board.getPiece(to).has_value())
+	else if (piece == PieceType::PAWN && abs(from.row - to.row) == 1 && abs(from.col - to.col) == 1 && !board.getPiece(to, opponentColor).has_value())
 	{
 		return PieceType::PAWN;
 	}

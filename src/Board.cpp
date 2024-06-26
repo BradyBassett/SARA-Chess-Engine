@@ -172,16 +172,13 @@ Bitboard Board::getAttacks(PieceType piece, Color color, int square) const
 	}
 }
 
-std::optional<PieceType> Board::getPiece(Position position) const
+std::optional<PieceType> Board::getPiece(Position position, Color color) const
 {
-	for (Color color : {Color::WHITE, Color::BLACK})
+	for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
 	{
-		for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
+		if (getPieceBitboard(piece, color).getBit(position))
 		{
-			if (getPieceBitboard(piece, color).getBit(position))
-			{
-				return piece;
-			}
+			return piece;
 		}
 	}
 
