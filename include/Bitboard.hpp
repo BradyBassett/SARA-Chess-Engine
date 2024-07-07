@@ -32,6 +32,7 @@ public:
 	Bitboard &operator>>=(uint64_t shift);
 	bool operator==(const Bitboard &other) const;
 	bool operator!=(const Bitboard &other) const;
+	uint64_t operator*(const Bitboard &other) const;
 
 private:
 	uint64_t value = 0x0;

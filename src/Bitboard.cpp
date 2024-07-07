@@ -145,3 +145,9 @@ bool Bitboard::operator!=(const Bitboard &other) const
 	bool notEqual = value != other.value;
 	return notEqual;
 }
+
+uint64_t Bitboard::operator*(const Bitboard &other) const
+{
+	uint64_t result = value * other.value;
+	return result;
+}
