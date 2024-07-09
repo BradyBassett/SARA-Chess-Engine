@@ -1,9 +1,6 @@
 #include "../include/MagicBitboards.hpp"
-#include "../include/JsonLoader.hpp"
 #include "../include/structs/Position.hpp"
 #include "../include/Utility.hpp"
-
-#include <nlohmann/json.hpp>
 
 std::once_flag MagicBitboards::initFlag;
 
@@ -19,12 +16,19 @@ std::array<std::array<uint64_t, 512>, 64> MagicBitboards::bishopAttacks = {};
 void MagicBitboards::init()
 {
 	std::call_once(initFlag, []() {
-		loadArrayFromJson("src/data/rookMagics.json", rookMagics);
-		loadArrayFromJson("src/data/bishopMagics.json", bishopMagics);
-		loadArrayFromJson("src/data/rookShifts.json", rookShifts);
-		loadArrayFromJson("src/data/bishopShifts.json", bishopShifts);
-		loadArrayFromJson("src/data/rookMasks.json", rookMasks);
-		loadArrayFromJson("src/data/bishopMasks.json", bishopMasks);
+		Utility::loadArrayFromJson("src/data/rookMagics.json", rookMagics);
+		Utility::loadArrayFromJson("src/data/bishopMagics.json", bishopMagics);
+		Utility::loadArrayFromJson("src/data/rookShifts.json", rookShifts);
+		Utility::loadArrayFromJson("src/data/bishopShifts.json", bishopShifts);
+		Utility::loadArrayFromJson("src/data/rookMasks.json", rookMasks);
+		Utility::loadArrayFromJson("src/data/bishopMasks.json", bishopMasks);
+
+		std::array<uint64_t, 64> rm = rookMagics;
+		std::array<uint64_t, 64> bm = bishopMagics;
+		std::array<int, 64> rs = rookShifts;
+		std::array<int, 64> bs = bishopShifts;
+		std::array<uint64_t, 64> rmasks = rookMasks;
+		std::array<uint64_t, 64> bmasks = bishopMasks;
 
 		for (int square = 0; square < 64; ++square)
 		{
