@@ -4,11 +4,14 @@
 
 #include "../include/Game.hpp"
 #include "../include/Utility.hpp"
+#include "../include/MagicBitboards.hpp"
 
 int main();
 
 int main()
 {
+	MagicBitboards::init(); // !: Maybe move this to Game constructor? Or Board constructor?
+
 	std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 	std::cout << "Enter Fen (or press enter for default): ";
 	std::string input;
