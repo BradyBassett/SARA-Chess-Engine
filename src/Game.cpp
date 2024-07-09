@@ -281,3 +281,16 @@ void Game::updateCastlingRights(PieceType piece, Color color, Position from)
 		}
 	}
 }
+
+bool Game::isInCheck()
+{
+	if (hasCachedInCheckValue)
+	{
+		return cachedInCheckValue;
+	}
+
+	cachedInCheckValue = MoveValidator::calculateInCheck();
+	hasCachedInCheckValue = true;
+
+	return cachedInCheckValue;
+}

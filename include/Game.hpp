@@ -53,7 +53,6 @@ private:
 	std::optional<Position> getEnPassantTargetSquare(PieceType piece, Position from, Position to, SpecialMove specialMove);
 	void updateCastlingRights(PieceType piece, Color color, Position from);
 	bool isInCheck();
-	bool calculateInCheck();
 };
 
 #endif // GAME_HPP

@@ -7,6 +7,7 @@ class MoveValidator
 {
 public:
 	static void validateMove(Position from, Position to, PieceType piece, Color color, Game &game);
+	static bool calculateInCheck();
 
 private:
 	static bool isPathClear(Position from, Position to, PieceType piece, Color color, Game &game);

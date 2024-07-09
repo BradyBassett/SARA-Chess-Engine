@@ -59,6 +59,11 @@ void MoveValidator::validateMove(Position from, Position to, PieceType piece, Co
 	}
 }
 
+bool MoveValidator::calculateInCheck()
+{
+	return true;
+}
+
 bool MoveValidator::isPathClear(Position from, Position to, PieceType piece, Color color, Game &game)
 {
 	Bitboard path = calculatePath(from, to, piece, color);
