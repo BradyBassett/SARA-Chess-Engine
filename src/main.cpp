@@ -10,7 +10,8 @@ int main();
 
 int main()
 {
-	MagicBitboards::init(); // !: Maybe move this to Game constructor? Or Board constructor?
+	 // !: Maybe move this to Game constructor? Or Board constructor?
+	MagicBitboards::init("src/data/rookMagics.json", "src/data/bishopMagics.json", "src/data/rookShifts.json", "src/data/bishopShifts.json", "src/data/rooksMasks.json", "src/data/bishopMasks.json");
 
 	std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 	std::cout << "Enter Fen (or press enter for default): ";

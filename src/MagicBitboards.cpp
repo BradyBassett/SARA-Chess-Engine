@@ -13,15 +13,15 @@ std::array<uint64_t, 64> MagicBitboards::bishopMasks = {};
 std::array<std::array<uint64_t, 4096>, 64> MagicBitboards::rookAttacks = {};
 std::array<std::array<uint64_t, 512>, 64> MagicBitboards::bishopAttacks = {};
 
-void MagicBitboards::init()
+void MagicBitboards::init(std::string rookMagicsPath, std::string bishopMagicsPath, std::string rookShiftsPath, std::string bishopShiftsPath, std::string rookMasksPath, std::string bishopMasksPath)
 {
-	std::call_once(initFlag, []() {
-		Utility::loadArrayFromJson("src/data/rookMagics.json", rookMagics);
-		Utility::loadArrayFromJson("src/data/bishopMagics.json", bishopMagics);
-		Utility::loadArrayFromJson("src/data/rookShifts.json", rookShifts);
-		Utility::loadArrayFromJson("src/data/bishopShifts.json", bishopShifts);
-		Utility::loadArrayFromJson("src/data/rookMasks.json", rookMasks);
-		Utility::loadArrayFromJson("src/data/bishopMasks.json", bishopMasks);
+	std::call_once(initFlag, [rookMagicsPath, bishopMagicsPath, rookShiftsPath, bishopShiftsPath, rookMasksPath, bishopMasksPath]() {
+		Utility::loadArrayFromJson(rookMagicsPath, rookMagics);
+		Utility::loadArrayFromJson(bishopMagicsPath, bishopMagics);
+		Utility::loadArrayFromJson(rookShiftsPath, rookShifts);
+		Utility::loadArrayFromJson(bishopShiftsPath, bishopShifts);
+		Utility::loadArrayFromJson(rookMasksPath, rookMasks);
+		Utility::loadArrayFromJson(bishopMasksPath, bishopMasks);
 
 		std::array<uint64_t, 64> rm = rookMagics;
 		std::array<uint64_t, 64> bm = bishopMagics;
