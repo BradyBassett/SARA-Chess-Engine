@@ -13,6 +13,8 @@ class MagicBitboards
 public:
 	static void init();
 	static Bitboard getSliderAttacks(int square, Bitboard occupied, PieceType pieceType);
+	static std::array<std::array<uint64_t, 4096>, 64> getRookAttacks();
+	static std::array<std::array<uint64_t, 512>, 64> getBishopAttacks();
 
 private:
 	static std::once_flag initFlag;
