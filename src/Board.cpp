@@ -13,6 +13,14 @@ Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare)
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
 }
 
+Board::Board(std::string whitePawnsPath, std::string blackPawnsPath, std::string knightsPath, std::string kingsPath, std::string fenPosition, std::string fenEnPassantTargetSquare)
+{
+	initializePieceLists();
+	initializeAttacks(whitePawnsPath, blackPawnsPath, knightsPath, kingsPath);
+	parseFenPosition(fenPosition);
+	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
+}
+
 Bitboard Board::getPieceBitboard(PieceType piece, Color color) const
 {
 	return pieceBitboards[static_cast<int>(color)][static_cast<int>(piece)];
@@ -160,11 +168,11 @@ Bitboard Board::getAttacks(PieceType piece, Color color, int square) const
 		case PieceType::KNIGHT:
 			return knightAttacks[square];
 		case PieceType::BISHOP:
-			return bishopAttacks[square];
+			return MagicBitboards::getSliderAttacks(square, getOccupiedBitboard(), PieceType::BISHOP);
 		case PieceType::ROOK:
-			return rookAttacks[square];
+			return MagicBitboards::getSliderAttacks(square, getOccupiedBitboard(), PieceType::ROOK);
 		case PieceType::QUEEN:
-			return queenAttacks[square];
+			return MagicBitboards::getSliderAttacks(square, getOccupiedBitboard(), PieceType::QUEEN);
 		case PieceType::KING:
 			return kingAttacks[square];
 		default:
@@ -402,20 +410,32 @@ void Board::initializePieceLists()
 	}
 }
 
-void Board::initializeAttacks()
+void Board::initializeAttacks(std::string whitePawnsPath, std::string blackPawnsPath, std::string knightsPath, std::string kingsPath)
 {
-	for (int square = 0; square < 64; square++)
+	std::array<uint64_t, 64> temp;
+
+	Utility::loadArrayFromJson(whitePawnsPath, temp);
+	for (size_t i = 0; i < 64; i++)
 	{
-		Position position = Utility::calculatePosition(square);
+		pawnAttacks[0][i] = Bitboard(temp[i]);
+	}
 
-		pawnAttacks[0][square] = MoveGenerator::generateAttacks(PieceType::PAWN, Color::WHITE, position);
-		pawnAttacks[1][square] = MoveGenerator::generateAttacks(PieceType::PAWN, Color::BLACK, position);
+	Utility::loadArrayFromJson(blackPawnsPath, temp);
+	for (size_t i = 0; i < 64; i++)
+	{
+		pawnAttacks[1][i] = Bitboard(temp[i]);
+	}
 
-		knightAttacks[square] = MoveGenerator::generateAttacks(PieceType::KNIGHT, Color::WHITE, position);
-		bishopAttacks[square] = MoveGenerator::generateAttacks(PieceType::BISHOP, Color::WHITE, position);
-		rookAttacks[square] = MoveGenerator::generateAttacks(PieceType::ROOK, Color::WHITE, position);
-		queenAttacks[square] = MoveGenerator::generateAttacks(PieceType::QUEEN, Color::WHITE, position);
-		kingAttacks[square] = MoveGenerator::generateAttacks(PieceType::KING, Color::WHITE, position);
+	Utility::loadArrayFromJson(knightsPath, temp);
+	for (size_t i = 0; i < 64; i++)
+	{
+		knightAttacks[i] = Bitboard(temp[i]);
+	}
+
+	Utility::loadArrayFromJson(kingsPath, temp);
+	for (size_t i = 0; i < 64; i++)
+	{
+		kingAttacks[i] = Bitboard(temp[i]);
 	}
 }
 
