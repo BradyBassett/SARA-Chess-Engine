@@ -9,7 +9,6 @@ class MoveGenerator
 {
 public:
 	static Bitboard generatePotentialMoves(PieceType piece, Color color, Position position);
-	static Bitboard generateAttacks(PieceType piece, Color color, Position position);
 
 private:
 	static Bitboard generatePotentialPawnMoves(Color color, Position position);
