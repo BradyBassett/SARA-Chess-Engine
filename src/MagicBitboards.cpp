@@ -53,16 +53,6 @@ Bitboard MagicBitboards::getSliderAttacks(int square, Bitboard occupied, PieceTy
 	}
 }
 
-std::array<std::array<uint64_t, 4096>, 64> MagicBitboards::getRookAttacks()
-{
-	return rookAttacks;
-}
-
-std::array<std::array<uint64_t, 512>, 64> MagicBitboards::getBishopAttacks()
-{
-	return bishopAttacks;
-}
-
 Bitboard MagicBitboards::getRookAttacks(int square, Bitboard occupied)
 {
 	uint64_t index = (rookMasks[square] & occupied.getValue()) * rookMagics[square] >> rookShifts[square];
