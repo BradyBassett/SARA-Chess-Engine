@@ -29,6 +29,19 @@ namespace Utility {
         }
     }
 
+    int convertStringToSquareNumber(std::string str)
+    {
+        if (str.length() != 2) {
+            throw std::invalid_argument("Invalid string length");
+        }
+
+        Position pos{8 - (str[1] - '0'), str[0] - 'a'};
+
+        validatePosition(pos);
+
+        return calculateSquareNumber(pos);
+    }
+
     Position convertStringToPosition(std::string str)
     {
         if (str.length() != 2) {

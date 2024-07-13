@@ -14,6 +14,7 @@ namespace Utility {
     Position calculatePosition(int squareNumber);
     void validatePosition(Position position);
     void validateSquareNumber(int squareNumber);
+    int convertStringToSquareNumber(std::string str);
     Position convertStringToPosition(std::string str);
     std::string convertPositionToString(Position position);
 
