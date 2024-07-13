@@ -3,25 +3,6 @@
 #include <array>
 #include <vector>
 
-Bitboard MoveGenerator::generateAttacks(PieceType piece, Color color, Position position)
-{
-	switch (piece)
-	{
-	case PieceType::PAWN:
-		return generatePawnAttacks(color, position);
-	case PieceType::KNIGHT:
-		return generateKnightAttacks(position);
-	case PieceType::BISHOP:
-	case PieceType::ROOK:
-	case PieceType::QUEEN:
-		return generateSlidingAttacks(piece, position);
-	case PieceType::KING:
-		return generateKingAttacks(position);
-	default:
-		return 0;
-	}
-}
-
 Bitboard MoveGenerator::generatePotentialMoves(PieceType piece, Color color, Position position)
 {
 	switch (piece)
