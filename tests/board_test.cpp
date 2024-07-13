@@ -384,3 +384,59 @@ const auto boardMovePieceParams = ::testing::Values(
 );
 
 INSTANTIATE_TEST_CASE_P(Board, BoardMovePieceTest, boardMovePieceParams);
+
+struct GetAttacksTestParams
+{
+	PieceType piece;
+	Color color;
+	int square;
+	Bitboard expectedAttacks;
+};
+
+class GetAttacksTest : public ::testing::TestWithParam<GetAttacksTestParams> {};
+
+TEST_P(GetAttacksTest, GetAttacks)
+{
+	auto params = GetParam();
+	Board board("../src/data/whitePawnAttacks.json", "../src/data/blackPawnAttacks.json", "../src/data/knightAttacks.json", "../src/data/kingAttacks.json");
+	Bitboard attacks = board.getAttacks(params.piece, params.color, params.square);
+	EXPECT_EQ(attacks, params.expectedAttacks);
+}
+
+const auto getAttacksTestParams = ::testing::Values(
+	GetAttacksTestParams{PieceType::PAWN, Color::WHITE, Utility::convertStringToSquareNumber("a1"), 0x2000000000000ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::WHITE, Utility::convertStringToSquareNumber("h1"), 0x40000000000000ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::WHITE, Utility::convertStringToSquareNumber("b8"), 0x0ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::WHITE, Utility::convertStringToSquareNumber("a4"), 0x2000000ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::WHITE, Utility::convertStringToSquareNumber("d6"), 0x1400ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::WHITE, Utility::convertStringToSquareNumber("f7"), 0x50ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::WHITE, Utility::convertStringToSquareNumber("g2"), 0xa00000000000ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::WHITE, Utility::convertStringToSquareNumber("e6"), 0x2800ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::BLACK, Utility::convertStringToSquareNumber("a8"), 0x200ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::BLACK, Utility::convertStringToSquareNumber("h8"), 0x4000ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::BLACK, Utility::convertStringToSquareNumber("b1"), 0x0ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::BLACK, Utility::convertStringToSquareNumber("a4"), 0x20000000000ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::BLACK, Utility::convertStringToSquareNumber("d6"), 0x14000000ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::BLACK, Utility::convertStringToSquareNumber("f7"), 0x500000ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::BLACK, Utility::convertStringToSquareNumber("g2"), 0xa000000000000000ULL},
+	GetAttacksTestParams{PieceType::PAWN, Color::BLACK, Utility::convertStringToSquareNumber("e6"), 0x28000000ULL},
+	GetAttacksTestParams{PieceType::KNIGHT, Color::WHITE, Utility::convertStringToSquareNumber("e4"), 0x28440044280000ULL},
+	GetAttacksTestParams{PieceType::KNIGHT, Color::WHITE, Utility::convertStringToSquareNumber("c6"), 0xa1100110aULL},
+	GetAttacksTestParams{PieceType::KNIGHT, Color::BLACK, Utility::convertStringToSquareNumber("f3"), 0x5088008850000000ULL},
+	GetAttacksTestParams{PieceType::KNIGHT, Color::BLACK, Utility::convertStringToSquareNumber("d5"), 0x142200221400ULL},
+	GetAttacksTestParams{PieceType::KNIGHT, Color::WHITE, Utility::convertStringToSquareNumber("b2"), 0x800080500000000ULL},
+	GetAttacksTestParams{PieceType::KNIGHT, Color::WHITE, Utility::convertStringToSquareNumber("h8"), 0x402000ULL},
+	GetAttacksTestParams{PieceType::KNIGHT, Color::BLACK, Utility::convertStringToSquareNumber("a1"), 0x4020000000000ULL},
+	GetAttacksTestParams{PieceType::KNIGHT, Color::BLACK, Utility::convertStringToSquareNumber("g7"), 0xa0100010ULL},
+	GetAttacksTestParams{PieceType::KING, Color::WHITE, Utility::convertStringToSquareNumber("h6"), 0xc040c000ULL},
+	GetAttacksTestParams{PieceType::KING, Color::WHITE, Utility::convertStringToSquareNumber("e2"), 0x3828380000000000ULL},
+	GetAttacksTestParams{PieceType::KING, Color::BLACK, Utility::convertStringToSquareNumber("a1"), 0x203000000000000ULL},
+	GetAttacksTestParams{PieceType::KING, Color::BLACK, Utility::convertStringToSquareNumber("b7"), 0x70507ULL},
+	GetAttacksTestParams{PieceType::KING, Color::BLACK, Utility::convertStringToSquareNumber("h4"), 0xc040c0000000ULL},
+	GetAttacksTestParams{PieceType::KING, Color::BLACK, Utility::convertStringToSquareNumber("d2"), 0x1c141c0000000000ULL},
+	GetAttacksTestParams{PieceType::KING, Color::BLACK, Utility::convertStringToSquareNumber("f8"), 0x7050ULL},
+	GetAttacksTestParams{PieceType::KING, Color::BLACK, Utility::convertStringToSquareNumber("c3"), 0xe0a0e00000000ULL}
+	// Sliding pieces are tested in the MagicBitboardsTest
+);
+
+INSTANTIATE_TEST_SUITE_P(GetAttacksTests, GetAttacksTest, getAttacksTestParams);
