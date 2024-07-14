@@ -25,7 +25,7 @@ void Game::setActiveColor(Color activeColor)
 	this->activeColor = activeColor;
 }
 
-Board Game::getBoard() const
+Board &Game::getBoard()
 {
 	return board;
 }

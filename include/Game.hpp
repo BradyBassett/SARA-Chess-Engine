@@ -18,7 +18,7 @@ public:
 
 	Color getActiveColor() const;
 	void setActiveColor(Color activeColor);
-	Board getBoard() const;
+	Board &getBoard();
 	int getHalfMoveClock() const;
 	void setHalfMoveClock(int halfMoveClock);
 	int getFullMoveNumber() const;
