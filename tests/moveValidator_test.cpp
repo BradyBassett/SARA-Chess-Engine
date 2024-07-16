@@ -17,7 +17,7 @@ class validValidateMoveTest : public ::testing::TestWithParam<ValidValidateMoveT
 TEST_P(validValidateMoveTest, test)
 {
 	auto params = GetParam();
-	Game game(params.fen);
+	Game game(params.fen, "../src/");
 	EXPECT_NO_THROW(MoveValidator::validateMove(params.from, params.to, params.piece, params.color, game));
 }
 
@@ -83,7 +83,7 @@ class invalidValidateMoveTest : public ::testing::TestWithParam<InvalidValidateM
 TEST_P(invalidValidateMoveTest, test)
 {
 	auto params = GetParam();
-	Game game(params.fen);
+	Game game(params.fen, "../src/");
 	EXPECT_THROW({
 		try
 		{

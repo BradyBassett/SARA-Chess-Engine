@@ -16,8 +16,8 @@
 class Board
 {
 public:
-	Board(std::string fenPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", std::string fenEnPassantTargetSquare = "-");
-	Board(std::string whitePawnsPath, std::string blackPawnsPath, std::string knightsPath, std::string kingsPath, std::string fenPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", std::string fenEnPassantTargetSquare = "-");
+	Board(std::string fenPosition, std::string fenEnPassantTargetSquare);
+	Board(std::string fenPosition, std::string fenEnPassantTargetSquare, std::string relativePath);
 
 	Bitboard getPieceBitboard(PieceType piece, Color color) const;
 	void setPieceBitboard(PieceType piece, Color color, Bitboard bitboard);
@@ -62,7 +62,7 @@ private:
 	// rookAttacks bishopAttacks, and queenAttacks are not stored because they are calculated using Magic Bitboards
 
 	void initializePieceLists();
-	void initializeAttacks(std::string whitePawnsPath = "data/whitePawnAttacks.json", std::string blackPawnsPath = "data/blackPawnAttacks.json", std::string knightsPath = "data/knightAttacks.json", std::string kingsPath = "data/kingAttacks.json");
+	void initializeAttacks(std::string relativePath = "");
 	void parseFenPosition(std::string fenPosition);
 	void loadPieceFromFen(PieceType piece, Color color, int square);
 	void parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare);

@@ -13,8 +13,10 @@
 class Game
 {
 public:
-	Game(std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	Game(std::string fen);
+	Game(std::string fen, std::string relativePath);
 	Game(std::vector<std::string> fenParts);
+	Game(std::vector<std::string> fenParts, std::string relativePath);
 
 	Color getActiveColor() const;
 	void setActiveColor(Color activeColor);

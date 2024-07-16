@@ -7,7 +7,19 @@ Game::Game(std::string fen) : Game(getFenTokens(fen))
 {
 }
 
+Game::Game(std::string fen, std::string relativePath) : Game(getFenTokens(fen), relativePath)
+{
+}
+
 Game::Game(std::vector<std::string> fenParts) : board(fenParts[0], fenParts[3])
+{
+	parseActiveColor(fenParts[1]);
+	parseCastlingRights(fenParts[2]);
+	parsehalfMoveClock(fenParts[4]);
+	parseFullMoveNumber(fenParts[5]);
+}
+
+Game::Game(std::vector<std::string> fenParts, std::string relativePath) : board(fenParts[0], fenParts[3], relativePath)
 {
 	parseActiveColor(fenParts[1]);
 	parseCastlingRights(fenParts[2]);

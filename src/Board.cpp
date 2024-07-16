@@ -12,10 +12,10 @@ Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare)
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
 }
 
-Board::Board(std::string whitePawnsPath, std::string blackPawnsPath, std::string knightsPath, std::string kingsPath, std::string fenPosition, std::string fenEnPassantTargetSquare)
+Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare, std::string relativePath)
 {
 	initializePieceLists();
-	initializeAttacks(whitePawnsPath, blackPawnsPath, knightsPath, kingsPath);
+	initializeAttacks(relativePath);
 	parseFenPosition(fenPosition);
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
 }
@@ -409,29 +409,29 @@ void Board::initializePieceLists()
 	}
 }
 
-void Board::initializeAttacks(std::string whitePawnsPath, std::string blackPawnsPath, std::string knightsPath, std::string kingsPath)
+void Board::initializeAttacks(std::string relativePath)
 {
 	std::array<uint64_t, 64> temp;
 
-	Utility::loadArrayFromJson(whitePawnsPath, temp);
+	Utility::loadArrayFromJson(relativePath + "data/whitePawnAttacks.json", temp);
 	for (size_t i = 0; i < 64; i++)
 	{
 		pawnAttacks[0][i] = Bitboard(temp[i]);
 	}
 
-	Utility::loadArrayFromJson(blackPawnsPath, temp);
+	Utility::loadArrayFromJson(relativePath + "data/blackPawnAttacks.json", temp);
 	for (size_t i = 0; i < 64; i++)
 	{
 		pawnAttacks[1][i] = Bitboard(temp[i]);
 	}
 
-	Utility::loadArrayFromJson(knightsPath, temp);
+	Utility::loadArrayFromJson(relativePath + "data/knightAttacks.json", temp);
 	for (size_t i = 0; i < 64; i++)
 	{
 		knightAttacks[i] = Bitboard(temp[i]);
 	}
 
-	Utility::loadArrayFromJson(kingsPath, temp);
+	Utility::loadArrayFromJson(relativePath + "data/kingAttacks.json", temp);
 	for (size_t i = 0; i < 64; i++)
 	{
 		kingAttacks[i] = Bitboard(temp[i]);
