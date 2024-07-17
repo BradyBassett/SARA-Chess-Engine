@@ -1,5 +1,4 @@
 #include "../include/Board.hpp"
-#include "../include/enums/PieceType.hpp"
 #include "../include/Utility.hpp"
 
 #include <map>
@@ -8,6 +7,7 @@ Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare)
 {
 	initializePieceLists();
 	initializeAttacks();
+	MagicBitboards::init();
 	parseFenPosition(fenPosition);
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
 }
@@ -16,6 +16,7 @@ Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare, std:
 {
 	initializePieceLists();
 	initializeAttacks(relativePath);
+	MagicBitboards::init(relativePath);
 	parseFenPosition(fenPosition);
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
 }
