@@ -11,16 +11,10 @@ public:
 
 private:
 	static Bitboard generatePotentialMoves(Position position, PieceType piece, Color color, Board &board);
-	static Bitboard generatePotentialPawnMoves(Color color, Position position, Bitboard moves);
-	static bool canDoublePawnPush(Color color, Position position);
+	static Bitboard generatePotentialPawnMoves(Color color, Position position, Bitboard moves, Bitboard occupied);
+	static bool canDoublePawnPush(Color color, Position position, Bitboard occupied);
 	static Bitboard generatePotentialKingMoves(Color color, Position position, Bitboard moves);
-	static bool isPathClear(Position from, Position to, PieceType piece, Color color, Board &board);
-	static Bitboard calculatePath(Position from, Position to, PieceType piece, Color color);
-	static Bitboard calculatePawnPath(Position from, Position to, Color color);
-	static Bitboard calculateDiagonalPath(Position from, Position to);
-	static Bitboard calculateOrthaogonalPath(Position from, Position to);
 	static bool isDiagonal(Position from, Position to);
-	static bool isOrthogonal(Position from, Position to);
 
 	static void validatePawnMove(Position from, Position to, PieceType piece, Color color, Board &board);
 	static void validateKingMove(Position from, Position to, PieceType piece, Color color, Game &game);

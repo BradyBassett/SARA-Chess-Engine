@@ -34,18 +34,7 @@ void MoveValidator::validateMove(Position from, Position to, PieceType piece, Co
 	// Check if the to square is in the list of potential moves
 	if (generatePotentialMoves(from, piece, color, board).getBit(to) == 0)
 	{
-		throw std::invalid_argument("Invalid move - The piece cannot move to the to square");
-	}
-
-	// Knights do not need a clear path and kings can only move one square
-	// Pawns are not excluded because they can move two squares on their first move
-	if (piece != PieceType::KNIGHT && piece != PieceType::KING)
-	{
-		// Check if the path is clear for all pieces except knights and kings
-		if (!isPathClear(from, to, piece, color, board))
-		{
-			throw std::invalid_argument("Invalid move - The path is not clear");
-		}
+		throw std::invalid_argument("Invalid move - The piece cannot move to the square");
 	}
 
 	if (piece == PieceType::PAWN)
@@ -72,7 +61,7 @@ Bitboard MoveValidator::generatePotentialMoves(Position position, PieceType piec
 
 	if (piece == PieceType::PAWN)
 	{
-		return generatePotentialPawnMoves(color, position, moves);
+		return generatePotentialPawnMoves(color, position, moves, board.getOccupiedBitboard());
 	}
 	else if (piece == PieceType::KING)
 	{
@@ -84,7 +73,7 @@ Bitboard MoveValidator::generatePotentialMoves(Position position, PieceType piec
 	}
 }
 
-Bitboard MoveValidator::generatePotentialPawnMoves(Color color, Position position, Bitboard moves)
+Bitboard MoveValidator::generatePotentialPawnMoves(Color color, Position position, Bitboard moves, Bitboard occupied)
 {
 	int direction = color == Color::WHITE ? -1 : 1;
 
@@ -96,7 +85,7 @@ Bitboard MoveValidator::generatePotentialPawnMoves(Color color, Position positio
 		moves.setBit(singleMove);
 	}
 
-	if (canDoublePawnPush(color, position) && doubleMove.row >= 0 && doubleMove.row < 8 && doubleMove.col >= 0 && doubleMove.col < 8)
+	if (canDoublePawnPush(color, position, occupied) && doubleMove.row >= 0 && doubleMove.row < 8 && doubleMove.col >= 0 && doubleMove.col < 8)
 	{
 		moves.setBit(doubleMove);
 	}
@@ -104,9 +93,21 @@ Bitboard MoveValidator::generatePotentialPawnMoves(Color color, Position positio
 	return moves;
 }
 
-bool MoveValidator::canDoublePawnPush(Color color, Position position)
+bool MoveValidator::canDoublePawnPush(Color color, Position position, Bitboard occupied)
 {
-	return (color == Color::WHITE && position.row == 6) || (color == Color::BLACK && position.row == 1);
+	bool isCorrectRow = (color == Color::WHITE && position.row == 6) || (color == Color::BLACK && position.row == 1);
+	bool isClearPath;
+
+	if (color == Color::WHITE)
+	{
+		isClearPath = occupied.getBit(Position{5, position.col}) == 0;
+	}
+	else
+	{
+		isClearPath = occupied.getBit(Position{2, position.col}) == 0;
+	}
+
+	return isCorrectRow && isClearPath;
 }
 
 Bitboard MoveValidator::generatePotentialKingMoves(Color color, Position position, Bitboard moves)
@@ -129,136 +130,9 @@ Bitboard MoveValidator::generatePotentialKingMoves(Color color, Position positio
 	return moves;
 }
 
-bool MoveValidator::isPathClear(Position from, Position to, PieceType piece, Color color, Board &board)
-{
-	Bitboard path = calculatePath(from, to, piece, color);
-	Bitboard occupied = board.getOccupiedBitboard();
-
-	// Check if the path is clear by checking if the intersection of the path and the occupied squares is empty
-	return (path & occupied) == Bitboard();
-}
-
-Bitboard MoveValidator::calculatePath(Position from, Position to, PieceType piece, Color color)
-{
-	Bitboard path;
-
-	switch (piece)
-	{
-		case PieceType::PAWN:
-		{
-			path = calculatePawnPath(from, to, color);
-			break;
-		}
-		case PieceType::BISHOP:
-		{
-			path = calculateDiagonalPath(from, to);
-			break;
-		}
-		case PieceType::ROOK:
-		{
-			path = calculateOrthaogonalPath(from, to);
-			break;
-		}
-		case PieceType::QUEEN:
-		{
-			if (isDiagonal(from, to))
-			{
-				path = calculateDiagonalPath(from, to);
-			}
-			else
-			{
-				path = calculateOrthaogonalPath(from, to);
-			}
-			break;
-		}
-	}
-
-	return path;
-}
-
-Bitboard MoveValidator::calculatePawnPath(Position from, Position to, Color color)
-{
-	Bitboard path;
-
-	// if the pawn is not moving diagonally and is advancing two squares, then calculate the path
-	if (!isDiagonal(from, to) && (from.row + 2 == to.row || from.row - 2 == to.row))
-	{
-		if (color == Color::WHITE)
-		{
-			if (from.row == 6 && to.row == 4)
-			{
-				path.setBit(Position{5, from.col});
-			}
-		}
-		else
-		{
-			if (from.row == 1 && to.row == 3)
-			{
-				path.setBit(Position{2, from.col});
-			}
-		}
-	}
-
-	return path;
-}
-
-Bitboard MoveValidator::calculateDiagonalPath(Position from, Position to)
-{
-	Bitboard path;
-
-	int rowIncrement = (to.row > from.row) ? 1 : -1;
-	int colIncrement = (to.col > from.col) ? 1 : -1;
-
-	// Start at the square after the from square
-	int row = from.row + rowIncrement;
-	int col = from.col + colIncrement;
-
-	while (row != to.row && col != to.col)
-	{
-		path.setBit(Position{row, col});
-		row += rowIncrement;
-		col += colIncrement;
-	}
-
-	return path;
-}
-
-Bitboard MoveValidator::calculateOrthaogonalPath(Position from, Position to)
-{
-	Bitboard path;
-
-	if (from.row == to.row)
-	{
-		int start = std::min(from.col, to.col);
-		int end = std::max(from.col, to.col);
-
-		for (int i = start + 1; i < end; i++)
-		{
-			path.setBit(Position{from.row, i});
-		}
-	}
-	else
-	{
-		int start = std::min(from.row, to.row);
-		int end = std::max(from.row, to.row);
-
-		for (int i = start + 1; i < end; i++)
-		{
-			path.setBit(Position{i, from.col});
-		}
-	}
-
-	return path;
-}
-
 bool MoveValidator::isDiagonal(Position from, Position to)
 {
 	return abs(to.row - from.row) == abs(to.col - from.col);
-}
-
-bool MoveValidator::isOrthogonal(Position from, Position to)
-{
-	return to.row == from.row || to.col == from.col;
 }
 
 void MoveValidator::validatePawnMove(Position from, Position to, PieceType piece, Color color, Board &board)
@@ -380,21 +254,7 @@ bool MoveValidator::isSquareAttacked(Position position, Color color, Board &boar
 				Bitboard attacks = board.getAttacks(piece, opponentColor, square);
 				if (attacks.getBit(position) == true)
 				{
-					// Check if the path is clear
-					if (piece != PieceType::KNIGHT && piece != PieceType::KING)
-					{
-						Bitboard path = calculatePath(Utility::calculatePosition(square), position, piece, opponentColor);
-						Bitboard occupied = board.getOccupiedBitboard();
-
-						if ((path & occupied) == Bitboard())
-						{
-							return true;
-						}
-					}
-					else
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}
