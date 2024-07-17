@@ -11,7 +11,7 @@
 class MagicBitboards
 {
 public:
-	static void init(std::string rookMagicsPath, std::string bishopMagicsPath, std::string rookShiftsPath, std::string bishopShiftsPath, std::string rookMasksPath, std::string bishopMasksPath);
+	static void init(std::string relativePath = "");
 	static Bitboard getSliderAttacks(int square, Bitboard occupied, PieceType pieceType);
 
 private:

@@ -7,7 +7,7 @@ class MagicBitboardsTest : public ::testing::Test
 protected:
 	void SetUp() override
 	{
-		MagicBitboards::init("../src/data/rookMagics.json", "../src/data/bishopMagics.json", "../src/data/rookShifts.json", "../src/data/bishopShifts.json", "../src/data/rookMasks.json", "../src/data/bishopMasks.json");
+		MagicBitboards::init("../src/");
 	}
 };
 
