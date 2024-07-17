@@ -60,6 +60,7 @@ void MoveValidator::validateMove(Position from, Position to, PieceType piece, Co
 	}
 }
 
+// todo: implement
 bool MoveValidator::calculateInCheck()
 {
 	return true;
@@ -69,19 +70,17 @@ Bitboard MoveValidator::generatePotentialMoves(Position position, PieceType piec
 {
 	Bitboard moves = board.getAttacks(piece, color, Utility::calculateSquareNumber(position));
 
-	switch (piece)
+	if (piece == PieceType::PAWN)
 	{
-	case PieceType::PAWN:
 		return generatePotentialPawnMoves(color, position, moves);
-	case PieceType::KING:
+	}
+	else if (piece == PieceType::KING)
+	{
 		return generatePotentialKingMoves(color, position, moves);
-	case PieceType::KNIGHT:
-	case PieceType::BISHOP:
-	case PieceType::ROOK:
-	case PieceType::QUEEN:
+	}
+	else
+	{
 		return moves;
-	default:
-		return 0;
 	}
 }
 
