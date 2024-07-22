@@ -440,3 +440,35 @@ const auto getAttacksTestParams = ::testing::Values(
 );
 
 INSTANTIATE_TEST_SUITE_P(GetAttacksTests, GetAttacksTest, getAttacksTestParams);
+
+struct GetRayTestParams
+{
+	int from;
+	int to;
+	Bitboard expectedRays;
+};
+
+class GetRayTest : public ::testing::TestWithParam<GetRayTestParams> {};
+
+TEST_P(GetRayTest, GetRay)
+{
+	auto params = GetParam();
+	Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "-", "../src/");
+	Bitboard rays = board.getRay(params.from, params.to);
+	EXPECT_EQ(rays, params.expectedRays);
+}
+
+const auto getRayTestParams = ::testing::Values(
+	GetRayTestParams{Utility::convertStringToSquareNumber("a1"), Utility::convertStringToSquareNumber("h1"), 0x7e00000000000000ULL},
+	GetRayTestParams{Utility::convertStringToSquareNumber("d6"), Utility::convertStringToSquareNumber("d1"), 0x8080808000000ULL},
+	GetRayTestParams{Utility::convertStringToSquareNumber("h4"), Utility::convertStringToSquareNumber("b4"), 0x7c00000000ULL},
+	GetRayTestParams{Utility::convertStringToSquareNumber("c6"), Utility::convertStringToSquareNumber("g6"), 0x380000ULL},
+	GetRayTestParams{Utility::convertStringToSquareNumber("c5"), Utility::convertStringToSquareNumber("g1"), 0x20100800000000ULL},
+	GetRayTestParams{Utility::convertStringToSquareNumber("d8"), Utility::convertStringToSquareNumber("h4"), 0x40201000ULL},
+	GetRayTestParams{Utility::convertStringToSquareNumber("a1"), Utility::convertStringToSquareNumber("h8"), 0x2040810204000ULL},
+	GetRayTestParams{Utility::convertStringToSquareNumber("b2"), Utility::convertStringToSquareNumber("g7"), 0x40810200000ULL},
+	GetRayTestParams{Utility::convertStringToSquareNumber("a1"), Utility::convertStringToSquareNumber("f2"), 0x0ULL},
+	GetRayTestParams{Utility::convertStringToSquareNumber("e6"), Utility::convertStringToSquareNumber("c3"), 0x0ULL}
+);
+
+INSTANTIATE_TEST_SUITE_P(GetRayTests, GetRayTest, getRayTestParams);

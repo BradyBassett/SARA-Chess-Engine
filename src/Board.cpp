@@ -7,6 +7,7 @@ Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare)
 {
 	initializePieceLists();
 	initializeAttacks();
+	initializeRays();
 	MagicBitboards::init();
 	parseFenPosition(fenPosition);
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
@@ -16,6 +17,7 @@ Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare, std:
 {
 	initializePieceLists();
 	initializeAttacks(relativePath);
+	initializeRays();
 	MagicBitboards::init(relativePath);
 	parseFenPosition(fenPosition);
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
@@ -178,6 +180,11 @@ Bitboard Board::getAttacks(PieceType piece, Color color, int square) const
 		default:
 			return Bitboard(0);
 	}
+}
+
+Bitboard Board::getRay(int from, int to) const
+{
+	return rays[from][to];
 }
 
 std::optional<PieceType> Board::getPiece(Position position, Color color) const
@@ -437,6 +444,63 @@ void Board::initializeAttacks(std::string relativePath)
 	{
 		kingAttacks[i] = Bitboard(temp[i]);
 	}
+}
+
+// ? Might be worth in the future to remove duplicate ray calculations, ex a1-h1 and h1-a1
+void Board::initializeRays()
+{
+	for (int from = 0; from < 64; from++)
+	{
+		for (int to = 0; to < 64; to++)
+		{
+			if (isValidRay(from, to))
+			{
+				rays[from][to] = calculateRay(from, to);
+			}
+			else
+			{
+				rays[from][to] = Bitboard(0);
+			}
+		}
+	}
+}
+
+bool Board::isValidRay(int from, int to)
+{
+	Position fromPosition = Utility::calculatePosition(from);
+	Position toPosition = Utility::calculatePosition(to);
+
+	if (fromPosition.row == toPosition.row || fromPosition.col == toPosition.col)
+	{
+		return true;
+	}
+
+	int rowDiff = abs(fromPosition.row - toPosition.row);
+	int colDiff = abs(fromPosition.col - toPosition.col);
+
+	return rowDiff == colDiff;
+}
+
+Bitboard Board::calculateRay(int from, int to)
+{
+    Position fromPosition = Utility::calculatePosition(from);
+    Position toPosition = Utility::calculatePosition(to);
+
+    int rowDiff = toPosition.row - fromPosition.row;
+    int colDiff = toPosition.col - fromPosition.col;
+
+    int rowDirection = rowDiff > 0 ? 1 : (rowDiff < 0 ? -1 : 0);
+    int colDirection = colDiff > 0 ? 1 : (colDiff < 0 ? -1 : 0);
+
+    Bitboard ray = Bitboard(0);
+    Position current = {fromPosition.row + rowDirection, fromPosition.col + colDirection};
+    while (current.row != toPosition.row || current.col != toPosition.col)
+    {
+        ray |= Bitboard(current);
+        current = {current.row + rowDirection, current.col + colDirection};
+    }
+
+    return ray;
 }
 
 void Board::parseFenPosition(std::string fenPosition)

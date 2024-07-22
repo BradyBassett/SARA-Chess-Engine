@@ -40,6 +40,7 @@ public:
 	int getKing(Color color) const;
 	void setKing(Color color, int king);
 	Bitboard getAttacks(PieceType piece, Color color, int square) const;
+	Bitboard getRay(int from, int to) const;
 	std::optional<PieceType> getPiece(Position position, Color color) const;
 
 	std::string boardToAscii() const;
@@ -60,9 +61,13 @@ private:
 	std::array<Bitboard, 64> knightAttacks;
 	std::array<Bitboard, 64> kingAttacks;
 	// rookAttacks bishopAttacks, and queenAttacks are not stored because they are calculated using Magic Bitboards
+	std::array<std::array<Bitboard, 64>, 64> rays;
 
 	void initializePieceLists();
 	void initializeAttacks(std::string relativePath = "");
+	void initializeRays();
+	bool isValidRay(int from, int to);
+	Bitboard calculateRay(int from, int to);
 	void parseFenPosition(std::string fenPosition);
 	void loadPieceFromFen(PieceType piece, Color color, int square);
 	void parseFenEnPassantTargetSquare(std::string fenEnPassantTargetSquare);
