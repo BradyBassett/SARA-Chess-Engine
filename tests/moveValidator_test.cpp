@@ -183,3 +183,38 @@ const auto invalidValidateMoveTestParams = ::testing::Values(
 );
 
 INSTANTIATE_TEST_SUITE_P(invalidValidateMoveTest, invalidValidateMoveTest, invalidValidateMoveTestParams);
+
+struct FindAbsolutePinsTestParams {
+	std::string fenPosition;
+	Color color;
+	Bitboard expectedPins;
+};
+
+class findAbsolutePinsTest : public ::testing::TestWithParam<FindAbsolutePinsTestParams> {};
+
+TEST_P(findAbsolutePinsTest, findAbsolutePins) {
+	auto params = GetParam();
+	Board board(params.fenPosition, "-", "../src/");
+	Bitboard actualPins = MoveValidator::findAbsolutePins(board, params.color);
+	EXPECT_EQ(actualPins, params.expectedPins);
+}
+
+const auto findAbsolutePinsTestParams = ::testing::Values(
+	FindAbsolutePinsTestParams{"3k4/8/8/8/3b4/8/1P6/K7", Color::WHITE, Bitboard{0x2000000000000ULL}},
+	FindAbsolutePinsTestParams{"3k4/8/r7/8/8/N7/8/K7", Color::WHITE, Bitboard{0x10000000000ULL}},
+	FindAbsolutePinsTestParams{"3k4/8/2q5/3N4/8/5K2/8/8", Color::WHITE, Bitboard{0x8000000ULL}},
+	FindAbsolutePinsTestParams{"3k4/8/8/8/8/2qB1K2/8/8", Color::WHITE, Bitboard{0x80000000000ULL}},
+	FindAbsolutePinsTestParams{"7k/8/b7/8/2P5/3KB2r/8/8", Color::WHITE, Bitboard{0x100400000000ULL}},
+	FindAbsolutePinsTestParams{"7k/4q3/b7/1P2P3/8/8/4KB1r/8", Color::WHITE, Bitboard{0x20000012000000ULL}},
+	FindAbsolutePinsTestParams{"7k/4q3/b7/1P2P3/6q1/5P2/4KB1r/8", Color::WHITE, Bitboard{0x20200012000000ULL}},
+	FindAbsolutePinsTestParams{"3k4/8/1r6/B7/8/5K2/8/8", Color::BLACK, Bitboard{0x20000ULL}},
+	FindAbsolutePinsTestParams{"8/8/3k4/3p4/8/5K2/3R4/8", Color::BLACK, Bitboard{0x8000000ULL}},
+	FindAbsolutePinsTestParams{"7k/6p1/8/8/8/8/1Q6/7K", Color::BLACK, Bitboard{0x4000ULL}},
+	FindAbsolutePinsTestParams{"8/8/8/1Q2pk2/8/8/8/7K", Color::BLACK, Bitboard{0x10000000ULL}},
+	FindAbsolutePinsTestParams{"K5B1/5p2/8/3k4/8/3b4/3R4/8", Color::BLACK, Bitboard{0x80000002000ULL}},
+	FindAbsolutePinsTestParams{"K5B1/5p2/8/Q1bk4/8/3b4/3R4/8", Color::BLACK, Bitboard{0x80004002000ULL}},
+	FindAbsolutePinsTestParams{"K5B1/5p2/8/Q1bk4/8/3b1r2/3R4/7Q", Color::BLACK, Bitboard{0x280004002000ULL}}
+
+);
+
+INSTANTIATE_TEST_SUITE_P(findAbsolutePinsTest, findAbsolutePinsTest, findAbsolutePinsTestParams);

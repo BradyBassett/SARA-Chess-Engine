@@ -8,6 +8,7 @@ class MoveValidator
 public:
 	static void validateMove(Position from, Position to, PieceType piece, Color color, Game &game);
 	static bool calculateInCheck();
+	static Bitboard findAbsolutePins(Board &board, Color friendlyColor);
 
 private:
 	static Bitboard generatePotentialMoves(Position position, PieceType piece, Color color, Board &board);
@@ -22,6 +23,9 @@ private:
 	static bool isValidRookPosition(Position from, Color color, Game &game);
 
 	static bool isSquareAttacked(Position position, Color color, Board &board);
+
+	static Bitboard xrayAttacks(Bitboard occupied, Bitboard friendlyPieces, int kingSquare, PieceType piece);
+	static Bitboard getObstructedRay(Bitboard ray, Bitboard occupied);
 };
 
 #endif // MOVEVALIDATOR_HPP

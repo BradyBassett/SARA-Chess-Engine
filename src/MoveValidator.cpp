@@ -55,6 +55,35 @@ bool MoveValidator::calculateInCheck()
 	return true;
 }
 
+Bitboard MoveValidator::findAbsolutePins(Board &board, Color friendlyColor)
+{
+	Bitboard pinned;
+	Bitboard occupied = board.getOccupiedBitboard();
+	Bitboard friendlyPieces = board.getColorBitboard(friendlyColor);
+	Color opponentColor = (friendlyColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
+	Bitboard opponentRQ = board.getPieceBitboard(PieceType::ROOK, opponentColor) | board.getPieceBitboard(PieceType::QUEEN, opponentColor);
+	Bitboard opponentBQ = board.getPieceBitboard(PieceType::BISHOP, opponentColor) | board.getPieceBitboard(PieceType::QUEEN, opponentColor);
+	int kingSquare = board.getKing(friendlyColor);
+
+	Bitboard pinner = xrayAttacks(occupied, friendlyPieces, kingSquare, PieceType::ROOK) & opponentRQ;
+	while (pinner.getValue())
+	{
+		int pinnerSquare = pinner.bitScanForward();
+		pinned |= getObstructedRay(board.getRay(pinnerSquare, kingSquare), occupied) & friendlyPieces;
+		pinner &= (pinner.getValue() - 1);
+	}
+
+	pinner = xrayAttacks(occupied, friendlyPieces, kingSquare, PieceType::BISHOP) & opponentBQ;
+	while (pinner.getValue())
+	{
+		int pinnerSquare = pinner.bitScanForward();
+		pinned |= getObstructedRay(board.getRay(pinnerSquare, kingSquare), occupied) & friendlyPieces;
+		pinner &= (pinner.getValue() - 1);
+	}
+
+	return pinned;
+}
+
 Bitboard MoveValidator::generatePotentialMoves(Position position, PieceType piece, Color color, Board &board)
 {
 	Bitboard moves = board.getAttacks(piece, color, Utility::calculateSquareNumber(position));
@@ -240,12 +269,12 @@ bool MoveValidator::isSquareAttacked(Position position, Color color, Board &boar
 	for (int square = 0; square < 64; square++)
 	{
 		// Check if the square is occupied by an opponent piece
-		if (opponentPieces.getBit(Utility::calculatePosition(square)) == 1)
+		if (opponentPieces.getBit(square) == 1)
 		{
 			for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
 			{
 				// Check if the opponent piece is on the square
-				if (board.getPieceBitboard(piece, opponentColor).getBit(Utility::calculatePosition(square)) == 0)
+				if (board.getPieceBitboard(piece, opponentColor).getBit(square) == 0)
 				{
 					continue;
 				}
@@ -261,4 +290,32 @@ bool MoveValidator::isSquareAttacked(Position position, Color color, Board &boar
 	}
 
 	return false;
+}
+
+Bitboard MoveValidator::xrayAttacks(Bitboard occupied, Bitboard friendlyPieces, int kingSquare, PieceType piece)
+{
+	Bitboard attacks = MagicBitboards::getSliderAttacks(kingSquare, occupied, piece);
+
+	friendlyPieces &= attacks;
+
+	return attacks ^ MagicBitboards::getSliderAttacks(kingSquare, occupied ^ friendlyPieces, piece);
+}
+
+Bitboard MoveValidator::getObstructedRay(Bitboard ray, Bitboard occupied)
+{
+	Bitboard obstructedRay;
+
+	while (ray.getValue())
+	{
+		int square = ray.bitScanForward();
+		obstructedRay.setBit(square);
+		ray &= (ray.getValue() - 1);
+
+		if (occupied.getBit(square))
+		{
+			break;
+		}
+	}
+
+	return obstructedRay;
 }
