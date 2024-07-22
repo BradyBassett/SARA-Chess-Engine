@@ -11,7 +11,7 @@ protected:
 	}
 };
 
-TEST_F(MagicBitboardsTest, AccessingRookAttacks)
+TEST_F(MagicBitboardsTest, GetRookAttacks)
 {
 	ASSERT_EQ(MagicBitboards::getSliderAttacks(0, Bitboard(0x8004010048040050ULL), PieceType::ROOK).getValue(), 0x1010101011eULL);
 	ASSERT_EQ(MagicBitboards::getSliderAttacks(7, Bitboard(0x4082000011048000ULL), PieceType::ROOK).getValue(), 0x807fULL);
@@ -25,7 +25,7 @@ TEST_F(MagicBitboardsTest, AccessingRookAttacks)
 	ASSERT_EQ(MagicBitboards::getSliderAttacks(48, Bitboard(0x2488480129050440ULL), PieceType::ROOK).getValue(), 0x10e010100000000ULL);
 }
 
-TEST_F(MagicBitboardsTest, AccessingBishopAttacks)
+TEST_F(MagicBitboardsTest, GetBishopAttacks)
 {
 	ASSERT_EQ(MagicBitboards::getSliderAttacks(0, Bitboard(0x8004010048040050ULL), PieceType::BISHOP).getValue(), 0x40200ULL);
 	ASSERT_EQ(MagicBitboards::getSliderAttacks(7, Bitboard(0x4082000011048000ULL), PieceType::BISHOP).getValue(), 0x10204000ULL);
@@ -39,7 +39,7 @@ TEST_F(MagicBitboardsTest, AccessingBishopAttacks)
 	ASSERT_EQ(MagicBitboards::getSliderAttacks(48, Bitboard(0x2488480129050440ULL), PieceType::BISHOP).getValue(), 0x200020408000000ULL);
 }
 
-TEST_F(MagicBitboardsTest, AccessingQueenAttacks)
+TEST_F(MagicBitboardsTest, GetQueenAttacks)
 {
 	ASSERT_EQ(MagicBitboards::getSliderAttacks(0, Bitboard(0x8004010048040050ULL), PieceType::QUEEN).getValue(), 0x1010105031eULL);
 	ASSERT_EQ(MagicBitboards::getSliderAttacks(7, Bitboard(0x4082000011048000ULL), PieceType::QUEEN).getValue(), 0x1020c07fULL);
