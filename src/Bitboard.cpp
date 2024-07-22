@@ -28,26 +28,41 @@ void Bitboard::setValue(uint64_t value)
 	this->value = value;
 }
 
+void Bitboard::setBit(int square)
+{
+	uint64_t bit = 1ULL << square;
+	value |= bit;
+}
+
 void Bitboard::setBit(Position position)
 {
 	Utility::validatePosition(position);
 
-	uint64_t bit = 1ULL << Utility::calculateSquareNumber(position);
-	value |= bit;
+	setBit(Utility::calculateSquareNumber(position));
+}
+
+void Bitboard::clearBit(int square)
+{
+	value &= ~(1ULL << square);
 }
 
 void Bitboard::clearBit(Position position)
 {
 	Utility::validatePosition(position);
 
-	value &= ~(1ULL << Utility::calculateSquareNumber(position));
+	clearBit(Utility::calculateSquareNumber(position));
+}
+
+bool Bitboard::getBit(int square) const
+{
+	return value & (1ULL << square);
 }
 
 bool Bitboard::getBit(Position position) const
 {
 	Utility::validatePosition(position);
 
-	return value & (1ULL << Utility::calculateSquareNumber(position));
+	return getBit(Utility::calculateSquareNumber(position));
 }
 
 int Bitboard::bitScanForward()
