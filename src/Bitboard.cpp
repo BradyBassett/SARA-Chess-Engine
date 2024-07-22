@@ -50,6 +50,15 @@ bool Bitboard::getBit(Position position) const
 	return value & (1ULL << Utility::calculateSquareNumber(position));
 }
 
+int Bitboard::bitScanForward()
+{
+	if (value == 0) {
+		return -1;
+	}
+
+	return __builtin_ctzll(value);
+}
+
 Bitboard Bitboard::operator|(const Bitboard &other) const
 {
 	Bitboard bitboard = Bitboard(value | other.value);

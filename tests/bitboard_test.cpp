@@ -468,3 +468,43 @@ INSTANTIATE_TEST_SUITE_P(
 	equalityOperationTestParams,
 	BitboardEqualityOperatorTestParamsToString
 );
+
+struct BitboardBitScanForwardTestParams
+{
+	uint64_t value;
+	int expectedBitScanForward;
+};
+
+class BitboardBitScanForwardTest : public ::testing::TestWithParam<BitboardBitScanForwardTestParams> {};
+
+TEST_P(BitboardBitScanForwardTest, BitScanForward)
+{
+	BitboardBitScanForwardTestParams params = GetParam();
+	Bitboard bitboard(params.value);
+
+	EXPECT_EQ(bitboard.bitScanForward(), params.expectedBitScanForward);
+}
+
+const auto bitScanForwardTestParams = ::testing::Values(
+	BitboardBitScanForwardTestParams{0x0ULL, -1},
+	BitboardBitScanForwardTestParams{0xa28ffdec2e1f93c0ULL, 6},
+	BitboardBitScanForwardTestParams{0x37a3a0b6b8ef8f68ULL, 3},
+	BitboardBitScanForwardTestParams{0xd816baa730035800ULL, 11},
+	BitboardBitScanForwardTestParams{0x79a902f96badb600ULL, 9},
+	BitboardBitScanForwardTestParams{0x835717f7b1f44f70ULL, 4},
+	BitboardBitScanForwardTestParams{0x9bcae086dea6cf00ULL, 8},
+	BitboardBitScanForwardTestParams{0x6b21546f1fdd9000ULL, 12},
+	BitboardBitScanForwardTestParams{0x681c4da9a8000000ULL, 27},
+	BitboardBitScanForwardTestParams{0xb273f94000000000ULL, 38},
+	BitboardBitScanForwardTestParams{0x69c2000000000000ULL, 49},
+	BitboardBitScanForwardTestParams{0x6800000000000000ULL, 59},
+	BitboardBitScanForwardTestParams{0x8000000000000000ULL, 63},
+	BitboardBitScanForwardTestParams{0x1ULL, 0},
+	BitboardBitScanForwardTestParams{0xffffffffffffffffULL, 0}
+);
+
+INSTANTIATE_TEST_SUITE_P(
+	BitboardValues,
+	BitboardBitScanForwardTest,
+	bitScanForwardTestParams
+);

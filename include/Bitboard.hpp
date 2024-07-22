@@ -19,6 +19,8 @@ public:
 	void clearBit(Position position);
 	bool getBit(Position position) const;
 
+	int bitScanForward();
+
 	Bitboard operator|(const Bitboard &other) const;
 	Bitboard &operator|=(const Bitboard &other);
 	Bitboard operator&(const Bitboard &other) const;
