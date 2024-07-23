@@ -3,12 +3,12 @@
 
 #include <stdexcept>
 
-void MoveValidator::validateMove(Position from, Position to, PieceType piece, Color color, Game &game)
+void MoveValidator::validateMove(Position from, Position to, PieceType piece, Color friendlyColor, Game &game)
 {
 	Board &board = game.getBoard();
 
 	// Check if the piece is of the correct color
-	if (color != game.getActiveColor())
+	if (friendlyColor != game.getActiveColor())
 	{
 		throw std::invalid_argument("Invalid move - You can only move your own pieces");
 	}
@@ -20,19 +20,19 @@ void MoveValidator::validateMove(Position from, Position to, PieceType piece, Co
 	}
 
 	// Check if the from square is occupied by a piece of the correct color
-	if (board.getColorBitboard(color).getBit(from) == 0)
+	if (board.getColorBitboard(friendlyColor).getBit(from) == 0)
 	{
 		throw std::invalid_argument("Invalid move - There is no piece on this square");
 	}
 
 	// Check if the to square is occupied by a piece of the same color
-	if (board.getColorBitboard(color).getBit(to) != 0)
+	if (board.getColorBitboard(friendlyColor).getBit(to) != 0)
 	{
 		throw std::invalid_argument("Invalid move - You cannot capture your own piece");
 	}
 
 	// Check if the to square is in the list of potential moves
-	if (generatePotentialMoves(from, piece, color, board).getBit(to) == 0)
+	if (generatePotentialMoves(from, piece, friendlyColor, board).getBit(to) == 0)
 	{
 		throw std::invalid_argument("Invalid move - The piece cannot move to the square");
 	}
@@ -40,12 +40,12 @@ void MoveValidator::validateMove(Position from, Position to, PieceType piece, Co
 	if (piece == PieceType::PAWN)
 	{
 		// Pawn-specific move validation
-		validatePawnMove(from, to, piece, color, board);
+		validatePawnMove(from, to, piece, friendlyColor, board);
 	}
 	else if (piece == PieceType::KING)
 	{
 		// King-specific move validation
-		validateKingMove(from, to, piece, color, game);
+		validateKingMove(from, to, piece, friendlyColor, game);
 	}
 }
 
@@ -84,17 +84,17 @@ Bitboard MoveValidator::findAbsolutePins(Board &board, Color friendlyColor)
 	return pinned;
 }
 
-Bitboard MoveValidator::generatePotentialMoves(Position position, PieceType piece, Color color, Board &board)
+Bitboard MoveValidator::generatePotentialMoves(Position position, PieceType piece, Color friendlyColor, Board &board)
 {
-	Bitboard moves = board.getAttacks(piece, color, Utility::calculateSquareNumber(position));
+	Bitboard moves = board.getAttacks(piece, friendlyColor, Utility::calculateSquareNumber(position));
 
 	if (piece == PieceType::PAWN)
 	{
-		return generatePotentialPawnMoves(color, position, moves, board.getOccupiedBitboard());
+		return generatePotentialPawnMoves(friendlyColor, position, moves, board.getOccupiedBitboard());
 	}
 	else if (piece == PieceType::KING)
 	{
-		return generatePotentialKingMoves(color, position, moves);
+		return generatePotentialKingMoves(friendlyColor, position, moves);
 	}
 	else
 	{
@@ -102,9 +102,9 @@ Bitboard MoveValidator::generatePotentialMoves(Position position, PieceType piec
 	}
 }
 
-Bitboard MoveValidator::generatePotentialPawnMoves(Color color, Position position, Bitboard moves, Bitboard occupied)
+Bitboard MoveValidator::generatePotentialPawnMoves(Color friendlyColor, Position position, Bitboard moves, Bitboard occupied)
 {
-	int direction = color == Color::WHITE ? -1 : 1;
+	int direction = friendlyColor == Color::WHITE ? -1 : 1;
 
 	Position singleMove{position.row + direction, position.col};
 	Position doubleMove{position.row + 2 * direction, position.col};
@@ -114,7 +114,7 @@ Bitboard MoveValidator::generatePotentialPawnMoves(Color color, Position positio
 		moves.setBit(singleMove);
 	}
 
-	if (canDoublePawnPush(color, position, occupied) && doubleMove.row >= 0 && doubleMove.row < 8 && doubleMove.col >= 0 && doubleMove.col < 8)
+	if (canDoublePawnPush(friendlyColor, position, occupied) && doubleMove.row >= 0 && doubleMove.row < 8 && doubleMove.col >= 0 && doubleMove.col < 8)
 	{
 		moves.setBit(doubleMove);
 	}
@@ -122,12 +122,12 @@ Bitboard MoveValidator::generatePotentialPawnMoves(Color color, Position positio
 	return moves;
 }
 
-bool MoveValidator::canDoublePawnPush(Color color, Position position, Bitboard occupied)
+bool MoveValidator::canDoublePawnPush(Color friendlyColor, Position position, Bitboard occupied)
 {
-	bool isCorrectRow = (color == Color::WHITE && position.row == 6) || (color == Color::BLACK && position.row == 1);
+	bool isCorrectRow = (friendlyColor == Color::WHITE && position.row == 6) || (friendlyColor == Color::BLACK && position.row == 1);
 	bool isClearPath;
 
-	if (color == Color::WHITE)
+	if (friendlyColor == Color::WHITE)
 	{
 		isClearPath = occupied.getBit(Position{5, position.col}) == 0;
 	}
@@ -139,17 +139,17 @@ bool MoveValidator::canDoublePawnPush(Color color, Position position, Bitboard o
 	return isCorrectRow && isClearPath;
 }
 
-Bitboard MoveValidator::generatePotentialKingMoves(Color color, Position position, Bitboard moves)
+Bitboard MoveValidator::generatePotentialKingMoves(Color friendlyColor, Position position, Bitboard moves)
 {
 	// Doesnt consider board state, only theoretically potential moves
 	if (position.col == 4)
 	{
-		if (position.row == 0 && color == Color::BLACK)
+		if (position.row == 0 && friendlyColor == Color::BLACK)
 		{
 			moves.setBit(Position{0, 6});
 			moves.setBit(Position{0, 2});
 		}
-		else if (position.row == 7 && color == Color::WHITE)
+		else if (position.row == 7 && friendlyColor == Color::WHITE)
 		{
 			moves.setBit(Position{7, 6});
 			moves.setBit(Position{7, 2});
@@ -164,9 +164,9 @@ bool MoveValidator::isDiagonal(Position from, Position to)
 	return abs(to.row - from.row) == abs(to.col - from.col);
 }
 
-void MoveValidator::validatePawnMove(Position from, Position to, PieceType piece, Color color, Board &board)
+void MoveValidator::validatePawnMove(Position from, Position to, PieceType piece, Color friendlyColor, Board &board)
 {
-	Color opponentColor = (color == Color::WHITE) ? Color::BLACK : Color::WHITE;
+	Color opponentColor = (friendlyColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
 
 	// Check direction
 	if (isDiagonal(from, to))
@@ -175,7 +175,7 @@ void MoveValidator::validatePawnMove(Position from, Position to, PieceType piece
 		if (board.getColorBitboard(opponentColor).getBit(to) != 1)
 		{
 			// Check if the pawn is on an en passant eligible square
-			int enPassantEligibleRow = (color == Color::WHITE) ? 3 : 4;
+			int enPassantEligibleRow = (friendlyColor == Color::WHITE) ? 3 : 4;
 			if (from.row == enPassantEligibleRow)
 			{
 				// if the en passant target square is not set or is not the to square, then the move is invalid
@@ -200,29 +200,29 @@ void MoveValidator::validatePawnMove(Position from, Position to, PieceType piece
 	}
 }
 
-void MoveValidator::validateKingMove(Position from, Position to, PieceType piece, Color color, Game &game)
+void MoveValidator::validateKingMove(Position from, Position to, PieceType piece, Color friendlyColor, Game &game)
 {
-	int castlingRow = (color == Color::WHITE) ? 7 : 0;
-	Position correctKingPosition = (color == Color::WHITE) ? Position{7, 4} : Position{0, 4};
+	int castlingRow = (friendlyColor == Color::WHITE) ? 7 : 0;
+	Position correctKingPosition = (friendlyColor == Color::WHITE) ? Position{7, 4} : Position{0, 4};
 
 	// if king is on correct square, and target square is left or right two squares and on the correct castling row, then the move is a castling move
 	if (from == correctKingPosition && abs(from.col - to.col) == 2 && (from.row == castlingRow && to.row == castlingRow))
 	{
-		validateCastlingMove(from, to, color, game);
+		validateCastlingMove(from, to, friendlyColor, game);
 	}
 	else
 	{
 		// Check if the king is moving into check
-		if (isSquareAttacked(to, color, game.getBoard()))
+		if (isSquareAttacked(to, friendlyColor, game.getBoard()))
 		{
 			throw std::invalid_argument("Invalid move - The king cannot move into check");
 		}
 	}
 }
 
-void MoveValidator::validateCastlingMove(Position from, Position to, Color color, Game &game)
+void MoveValidator::validateCastlingMove(Position from, Position to, Color friendlyColor, Game &game)
 {
-	CastleRights castleRights = (color == Color::WHITE) ? game.getWhiteCastleRights() : game.getBlackCastleRights();
+	CastleRights castleRights = (friendlyColor == Color::WHITE) ? game.getWhiteCastleRights() : game.getBlackCastleRights();
 	bool kingSide = castleRights.canCastleKingSide();
 	bool queenSide = castleRights.canCastleQueenSide();
 
@@ -249,7 +249,7 @@ void MoveValidator::validateCastlingMove(Position from, Position to, Color color
 			}
 
 			// Check if the king is castling through check
-			if (isSquareAttacked(Position{from.row, i}, color, board))
+			if (isSquareAttacked(Position{from.row, i}, friendlyColor, board))
 			{
 				throw std::invalid_argument("Invalid move - The king cannot castle through check");
 			}
@@ -261,9 +261,9 @@ void MoveValidator::validateCastlingMove(Position from, Position to, Color color
 	}
 }
 
-bool MoveValidator::isSquareAttacked(Position position, Color color, Board &board)
+bool MoveValidator::isSquareAttacked(Position position, Color friendlyColor, Board &board)
 {
-	Color opponentColor = (color == Color::WHITE) ? Color::BLACK : Color::WHITE;
+	Color opponentColor = (friendlyColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
 	Bitboard opponentPieces = board.getColorBitboard(opponentColor);
 
 	for (int square = 0; square < 64; square++)
