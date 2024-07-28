@@ -310,27 +310,24 @@ bool MoveValidator::isValidPinnedPieceMove(Position from, Position to, Color fri
 bool MoveValidator::isSquareAttacked(Position position, Color friendlyColor, Board &board)
 {
 	Color opponentColor = (friendlyColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
-	Bitboard opponentPieces = board.getColorBitboard(opponentColor);
 
-	for (int square = 0; square < 64; square++)
+	// Iterate over all piece types
+	for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
 	{
-		// Check if the square is occupied by an opponent piece
-		if (opponentPieces.getBit(square) == 1)
-		{
-			for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
-			{
-				// Check if the opponent piece is on the square
-				if (board.getPieceBitboard(piece, opponentColor).getBit(square) == 0)
-				{
-					continue;
-				}
+		// Get the bitboard of the opponent's pieces of the current piece type
+		Bitboard opponentPieces = board.getPieceBitboard(piece, opponentColor);
 
-				// Check if the opponent piece can attack the square
-				Bitboard attacks = board.getAttacks(piece, opponentColor, square);
-				if (attacks.getBit(position) == true)
-				{
-					return true;
-				}
+		// Iterate over all squares occupied by the opponent's pieces of the current piece type
+		while (opponentPieces.getValue())
+		{
+			int square = opponentPieces.bitScanForward();
+			opponentPieces.clearBit(square);
+
+			Bitboard attacks = board.getAttacks(piece, opponentColor, square);
+			// Check if the square is attacked by the opponent's piece
+			if (attacks.getBit(position) == 1)
+			{
+				return true;
 			}
 		}
 	}
