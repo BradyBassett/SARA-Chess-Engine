@@ -47,6 +47,11 @@ void MoveValidator::validateMove(Position from, Position to, PieceType piece, Co
 		// King-specific move validation
 		validateKingMove(from, to, piece, friendlyColor, game);
 	}
+
+	if (!isValidPinnedPieceMove(from, to, friendlyColor, board))
+	{
+		throw std::invalid_argument("Invalid move - The piece is pinned and cannot move in that direction");
+	}
 }
 
 // todo: implement
@@ -241,7 +246,7 @@ void MoveValidator::validateCastlingMove(Position from, Position to, Color frien
 
 		// Check if the squares between the king and the rook are empty
 		int direction = (to.col > from.col) ? 1 : -1;
-		for(int i = from.col + direction; (i < 7 && i > 0); i += direction)
+		for (int i = from.col + direction; (i < 7 && i > 0); i += direction)
 		{
 			if (board.getOccupiedBitboard().getBit(Position{from.row, i}) != 0)
 			{
@@ -259,6 +264,47 @@ void MoveValidator::validateCastlingMove(Position from, Position to, Color frien
 	{
 		throw std::invalid_argument("Invalid move - You cannot castle");
 	}
+}
+
+bool MoveValidator::isValidPinnedPieceMove(Position from, Position to, Color friendlyColor, Board &board)
+{
+	Bitboard pinned = findAbsolutePins(board, friendlyColor);
+
+	// Check if the piece being moved is pinned
+	if (pinned.getBit(from) == 1)
+	{
+		int kingSquare = board.getKing(friendlyColor);
+		Position kingPosition = Utility::calculatePosition(kingSquare);
+		Position pinDirection{(from.row < kingPosition.row) ? -1 : (from.row > kingPosition.row) ? 1 : 0,
+							  (from.col < kingPosition.col) ? -1 : (from.col > kingPosition.col) ? 1 : 0};
+		int pinningPieceSquare = -1;
+		Position current = from;
+		Color opponentColor = (friendlyColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
+
+		// Find the piece that is pinning the pinned piece
+		while (Utility::isValidPosition(current))
+		{
+			current.row += pinDirection.row;
+			current.col += pinDirection.col;
+
+			if (board.getColorBitboard(opponentColor).getBit(current) == 1)
+			{
+				pinningPieceSquare = Utility::calculateSquareNumber(current);
+				break;
+			}
+		}
+
+		// Check if the move is along the pinning ray or to the pinning piece
+		Bitboard ray = board.getRay(pinningPieceSquare, kingSquare);
+		if (ray.getBit(to) || to == Utility::calculatePosition(pinningPieceSquare))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	return true;
 }
 
 bool MoveValidator::isSquareAttacked(Position position, Color friendlyColor, Board &board)

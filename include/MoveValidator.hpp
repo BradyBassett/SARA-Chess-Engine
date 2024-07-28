@@ -19,6 +19,7 @@ private:
 
 	static void validatePawnMove(Position from, Position to, PieceType piece, Color friendlyColor, Board &board);
 	static void validateKingMove(Position from, Position to, PieceType piece, Color friendlyColor, Game &game);
+	static bool isValidPinnedPieceMove(Position from, Position to, Color friendlyColor, Board &board);
 	static void validateCastlingMove(Position from, Position to, Color friendlyColor, Game &game);
 
 	static bool isSquareAttacked(Position position, Color friendlyColor, Board &board);
