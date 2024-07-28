@@ -72,7 +72,7 @@ CastleRights Game::getBlackCastleRights() const
 	return blackCastleRights;
 }
 
-// Todo: eventually add support for check
+// TODO: eventually add support for check
 void Game::makeMove(Position from, Position to, PromotionPiece promotionPiece)
 {
 	if (!board.getPiece(from, activeColor).has_value())

@@ -54,7 +54,7 @@ void MoveValidator::validateMove(Position from, Position to, PieceType piece, Co
 	}
 }
 
-// todo: implement
+// TODO: implement
 bool MoveValidator::calculateInCheck()
 {
 	return true;
@@ -310,8 +310,6 @@ bool MoveValidator::isValidPinnedPieceMove(Position from, Position to, Color fri
 bool MoveValidator::isSquareAttacked(Position position, Color friendlyColor, Board &board)
 {
     Color opponentColor = (friendlyColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
-
-    // Combine all opponent piece bitboards into a single bitboard
     Bitboard opponentPieces = board.getColorBitboard(opponentColor);
 
     // Iterate over all squares occupied by the opponent's pieces
