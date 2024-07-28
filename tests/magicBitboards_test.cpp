@@ -7,7 +7,7 @@ class MagicBitboardsTest : public ::testing::Test
 protected:
 	void SetUp() override
 	{
-		MagicBitboards::init("../src/");
+		MagicBitboards::init();
 	}
 };
 

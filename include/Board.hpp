@@ -17,7 +17,6 @@ class Board
 {
 public:
 	Board(std::string fenPosition, std::string fenEnPassantTargetSquare);
-	Board(std::string fenPosition, std::string fenEnPassantTargetSquare, std::string relativePath);
 
 	Bitboard getPieceBitboard(PieceType piece, Color color) const;
 	void setPieceBitboard(PieceType piece, Color color, Bitboard bitboard);
@@ -64,7 +63,7 @@ private:
 	std::array<std::array<Bitboard, 64>, 64> rays;
 
 	void initializePieceLists();
-	void initializeAttacks(std::string relativePath = "");
+	void initializeAttacks();
 	void initializeRays();
 	bool isValidRay(int from, int to);
 	Bitboard calculateRay(int from, int to);

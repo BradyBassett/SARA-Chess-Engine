@@ -17,7 +17,7 @@ class validValidateMoveTest : public ::testing::TestWithParam<ValidValidateMoveT
 TEST_P(validValidateMoveTest, test)
 {
 	auto params = GetParam();
-	Game game(params.fen, "../src/");
+	Game game(params.fen);
 	EXPECT_NO_THROW(MoveValidator::validateMove(params.from, params.to, params.piece, params.color, game));
 }
 
@@ -93,7 +93,7 @@ class invalidValidateMoveTest : public ::testing::TestWithParam<InvalidValidateM
 TEST_P(invalidValidateMoveTest, test)
 {
 	auto params = GetParam();
-	Game game(params.fen, "../src/");
+	Game game(params.fen);
 	EXPECT_THROW({
 		try
 		{
@@ -212,7 +212,7 @@ class findAbsolutePinsTest : public ::testing::TestWithParam<FindAbsolutePinsTes
 
 TEST_P(findAbsolutePinsTest, findAbsolutePins) {
 	auto params = GetParam();
-	Board board(params.fenPosition, "-", "../src/");
+	Board board(params.fenPosition, "-");
 	Bitboard actualPins = MoveValidator::findAbsolutePins(board, params.color);
 	EXPECT_EQ(actualPins, params.expectedPins);
 }

@@ -51,7 +51,7 @@ protected:
 TEST_P(BoardConstructorTest, BoardConstructor)
 {
 	auto params = GetParam();
-	Board board(params.fenPosition, params.fenEnPassantTargetSquare, "../src/");
+	Board board(params.fenPosition, params.fenEnPassantTargetSquare);
 
 	// Bitboards
 	EXPECT_EQ(board.getPieceBitboard(PieceType::PAWN, Color::WHITE), Bitboard(params.whitePawns));
@@ -184,7 +184,7 @@ class BoardFenPartsTest : public ::testing::TestWithParam<BoardFenPartsParams> {
 TEST_P(BoardFenPartsTest, BoardFenParts)
 {
 	auto params = GetParam();
-	Board board(params.fenPosition, params.enPassantTargetSquare, "../src/");
+	Board board(params.fenPosition, params.enPassantTargetSquare);
 
 	EXPECT_EQ(board.getFenPosition(), params.fenPosition);
 	EXPECT_EQ(board.getFenEnPassantTargetSquare(), params.enPassantTargetSquare);
@@ -216,7 +216,7 @@ class BoardMovePieceTest : public ::testing::TestWithParam<BoardMovePieceParams>
 TEST_P(BoardMovePieceTest, BoardMovePiece)
 {
 	auto params = GetParam();
-	Board board(params.fenPosition, params.fenEnPassantTargetSquare, "../src/");
+	Board board(params.fenPosition, params.fenEnPassantTargetSquare);
 
 	board.movePiece(params.move);
 
@@ -398,7 +398,7 @@ class GetAttacksTest : public ::testing::TestWithParam<GetAttacksTestParams> {};
 TEST_P(GetAttacksTest, GetAttacks)
 {
 	auto params = GetParam();
-	Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "-", "../src/");
+	Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "-");
 	Bitboard attacks = board.getAttacks(params.piece, params.color, params.square);
 	EXPECT_EQ(attacks, params.expectedAttacks);
 }
@@ -453,7 +453,7 @@ class GetRayTest : public ::testing::TestWithParam<GetRayTestParams> {};
 TEST_P(GetRayTest, GetRay)
 {
 	auto params = GetParam();
-	Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "-", "../src/");
+	Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "-");
 	Bitboard rays = board.getRay(params.from, params.to);
 	EXPECT_EQ(rays, params.expectedRays);
 }

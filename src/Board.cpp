@@ -1,5 +1,6 @@
 #include "../include/Board.hpp"
 #include "../include/Utility.hpp"
+#include "../include/PrecomputedData.hpp"
 
 #include <map>
 
@@ -9,16 +10,6 @@ Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare)
 	initializeAttacks();
 	initializeRays();
 	MagicBitboards::init();
-	parseFenPosition(fenPosition);
-	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
-}
-
-Board::Board(std::string fenPosition, std::string fenEnPassantTargetSquare, std::string relativePath)
-{
-	initializePieceLists();
-	initializeAttacks(relativePath);
-	initializeRays();
-	MagicBitboards::init(relativePath);
 	parseFenPosition(fenPosition);
 	parseFenEnPassantTargetSquare(fenEnPassantTargetSquare);
 }
@@ -417,33 +408,11 @@ void Board::initializePieceLists()
 	}
 }
 
-void Board::initializeAttacks(std::string relativePath)
+void Board::initializeAttacks()
 {
-	std::array<uint64_t, 64> temp;
-
-	Utility::loadArrayFromJson(relativePath + "data/whitePawnAttacks.json", temp);
-	for (size_t i = 0; i < 64; i++)
-	{
-		pawnAttacks[0][i] = Bitboard(temp[i]);
-	}
-
-	Utility::loadArrayFromJson(relativePath + "data/blackPawnAttacks.json", temp);
-	for (size_t i = 0; i < 64; i++)
-	{
-		pawnAttacks[1][i] = Bitboard(temp[i]);
-	}
-
-	Utility::loadArrayFromJson(relativePath + "data/knightAttacks.json", temp);
-	for (size_t i = 0; i < 64; i++)
-	{
-		knightAttacks[i] = Bitboard(temp[i]);
-	}
-
-	Utility::loadArrayFromJson(relativePath + "data/kingAttacks.json", temp);
-	for (size_t i = 0; i < 64; i++)
-	{
-		kingAttacks[i] = Bitboard(temp[i]);
-	}
+	pawnAttacks = PrecomputedData::pawnAttacks;
+	knightAttacks = PrecomputedData::knightAttacks;
+	kingAttacks = PrecomputedData::kingAttacks;
 }
 
 // ? Might be worth in the future to remove duplicate ray calculations, ex a1-h1 and h1-a1

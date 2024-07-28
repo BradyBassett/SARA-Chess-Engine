@@ -1,6 +1,7 @@
 #include "../include/MagicBitboards.hpp"
 #include "../include/structs/Position.hpp"
 #include "../include/Utility.hpp"
+#include "../include/PrecomputedData.hpp"
 
 std::once_flag MagicBitboards::initFlag;
 
@@ -13,15 +14,15 @@ std::array<uint64_t, 64> MagicBitboards::bishopMasks = {};
 std::array<std::array<uint64_t, 4096>, 64> MagicBitboards::rookAttacks = {};
 std::array<std::array<uint64_t, 512>, 64> MagicBitboards::bishopAttacks = {};
 
-void MagicBitboards::init(std::string relativePath)
+void MagicBitboards::init()
 {
-	std::call_once(initFlag, [relativePath]() {
-		Utility::loadArrayFromJson(relativePath + "data/rookMagics.json", rookMagics);
-		Utility::loadArrayFromJson(relativePath + "data/bishopMagics.json", bishopMagics);
-		Utility::loadArrayFromJson(relativePath + "data/rookShifts.json", rookShifts);
-		Utility::loadArrayFromJson(relativePath + "data/bishopShifts.json", bishopShifts);
-		Utility::loadArrayFromJson(relativePath + "data/rookMasks.json", rookMasks);
-		Utility::loadArrayFromJson(relativePath + "data/bishopMasks.json", bishopMasks);
+	std::call_once(initFlag, []() {
+		rookMagics = PrecomputedData::rookMagics;
+		bishopMagics = PrecomputedData::bishopMagics;
+		rookShifts = PrecomputedData::rookShifts;
+		bishopShifts = PrecomputedData::bishopShifts;
+		rookMasks = PrecomputedData::rookMasks;
+		bishopMasks = PrecomputedData::bishopMasks;
 
 		for (int square = 0; square < 64; ++square)
 		{
