@@ -12,6 +12,7 @@
 namespace Utility {
     int calculateSquareNumber(Position position);
     Position calculatePosition(int squareNumber);
+    bool isValidPosition(Position position);
     void validatePosition(Position position);
     void validateSquareNumber(int squareNumber);
     int convertStringToSquareNumber(std::string str);

@@ -15,9 +15,14 @@ namespace Utility {
         return Position{squareNumber / 8, squareNumber % 8};
     }
 
+    bool isValidPosition(Position position)
+    {
+        return position.row >= 0 && position.row < 8 && position.col >= 0 && position.col < 8;
+    }
+
     void validatePosition(Position position)
     {
-        if (position.row < 0 || position.row > 7 || position.col < 0 || position.col > 7) {
+        if (!isValidPosition(position)) {
             throw std::invalid_argument("Position out of bounds");
         }
     }
