@@ -289,7 +289,7 @@ bool Game::isInCheck()
 		return cachedInCheckValue;
 	}
 
-	cachedInCheckValue = MoveValidator::calculateInCheck();
+	cachedInCheckValue = MoveValidator::isSquareAttacked(getBoard(), getActiveColor(), getBoard().getKing(getActiveColor()));
 	hasCachedInCheckValue = true;
 
 	return cachedInCheckValue;

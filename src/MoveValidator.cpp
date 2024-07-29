@@ -54,10 +54,72 @@ void MoveValidator::validateMove(Position from, Position to, PieceType piece, Co
 	}
 }
 
-// TODO: implement
-bool MoveValidator::calculateInCheck()
+bool MoveValidator::isSquareAttacked(Board &board, Color friendlyColor, int square)
 {
-	return true;
+	Bitboard occupied = board.getOccupiedBitboard();
+	Color opponentColor = (friendlyColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
+
+	Bitboard enemyRooks = board.getPieceBitboard(PieceType::ROOK, opponentColor);
+	if (enemyRooks.getValue())
+	{
+		Bitboard rookAttacks = MagicBitboards::getSliderAttacks(square, occupied, PieceType::ROOK);
+		if (rookAttacks.getValue() & enemyRooks.getValue())
+		{
+			return true;
+		}
+	}
+
+	Bitboard enemyBishops = board.getPieceBitboard(PieceType::BISHOP, opponentColor);
+	if (enemyBishops.getValue())
+	{
+		Bitboard bishopAttacks = MagicBitboards::getSliderAttacks(square, occupied, PieceType::BISHOP);
+		if (bishopAttacks.getValue() & enemyBishops.getValue())
+		{
+			return true;
+		}
+	}
+
+	Bitboard enemyQueens = board.getPieceBitboard(PieceType::QUEEN, opponentColor);
+	if (enemyQueens.getValue())
+	{
+		Bitboard queenAttacks = MagicBitboards::getSliderAttacks(square, occupied, PieceType::QUEEN);
+		if (queenAttacks.getValue() & enemyQueens.getValue())
+		{
+			return true;
+		}
+	}
+
+	Bitboard enemyKnights = board.getPieceBitboard(PieceType::KNIGHT, opponentColor);
+	if (enemyKnights.getValue())
+	{
+		Bitboard knightAttacks = board.getAttacks(PieceType::KNIGHT, opponentColor, square);
+		if (knightAttacks.getValue() & enemyKnights.getValue())
+		{
+			return true;
+		}
+	}
+
+	Bitboard enemyPawns = board.getPieceBitboard(PieceType::PAWN, opponentColor);
+	if (enemyPawns.getValue())
+	{
+		Bitboard pawnAttacks = board.getAttacks(PieceType::PAWN, opponentColor, square);
+		if (pawnAttacks.getValue() & enemyPawns.getValue())
+		{
+			return true;
+		}
+	}
+
+	Bitboard enemyKings = board.getPieceBitboard(PieceType::KING, opponentColor);
+	if (enemyKings.getValue())
+	{
+		Bitboard kingAttacks = board.getAttacks(PieceType::KING, opponentColor, square);
+		if (kingAttacks.getValue() & enemyKings.getValue())
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 Bitboard MoveValidator::findAbsolutePins(Board &board, Color friendlyColor)
@@ -218,7 +280,7 @@ void MoveValidator::validateKingMove(Position from, Position to, PieceType piece
 	else
 	{
 		// Check if the king is moving into check
-		if (isSquareAttacked(to, friendlyColor, game.getBoard()))
+		if (isSquareAttacked(game.getBoard(), friendlyColor, Utility::calculateSquareNumber(to)))
 		{
 			throw std::invalid_argument("Invalid move - The king cannot move into check");
 		}
@@ -254,7 +316,7 @@ void MoveValidator::validateCastlingMove(Position from, Position to, Color frien
 			}
 
 			// Check if the king is castling through check
-			if (isSquareAttacked(Position{from.row, i}, friendlyColor, board))
+			if (isSquareAttacked(board, friendlyColor, Utility::calculateSquareNumber(Position{from.row, i})))
 			{
 				throw std::invalid_argument("Invalid move - The king cannot castle through check");
 			}
@@ -305,36 +367,6 @@ bool MoveValidator::isValidPinnedPieceMove(Position from, Position to, Color fri
 	}
 
 	return true;
-}
-
-bool MoveValidator::isSquareAttacked(Position position, Color friendlyColor, Board &board)
-{
-    Color opponentColor = (friendlyColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
-    Bitboard opponentPieces = board.getColorBitboard(opponentColor);
-
-    // Iterate over all squares occupied by the opponent's pieces
-    while (opponentPieces.getValue())
-    {
-        int square = opponentPieces.bitScanForward();
-        opponentPieces.clearBit(square);
-
-        // Iterate over all piece types
-        for (PieceType piece : {PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING})
-        {
-            // Check if the opponent piece is on the square
-            if (board.getPieceBitboard(piece, opponentColor).getBit(square))
-            {
-                // Check if the opponent piece can attack the square
-                Bitboard attacks = board.getAttacks(piece, opponentColor, square);
-                if (attacks.getBit(position))
-                {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
 }
 
 Bitboard MoveValidator::xrayAttacks(Bitboard occupied, Bitboard friendlyPieces, int kingSquare, PieceType piece)

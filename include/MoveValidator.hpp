@@ -7,7 +7,7 @@ class MoveValidator
 {
 public:
 	static void validateMove(Position from, Position to, PieceType piece, Color friendlyColor, Game &game);
-	static bool calculateInCheck();
+	static bool isSquareAttacked(Board &board, Color friendlyColor, int square);
 	static Bitboard findAbsolutePins(Board &board, Color friendlyColor);
 
 private:
@@ -22,7 +22,6 @@ private:
 	static bool isValidPinnedPieceMove(Position from, Position to, Color friendlyColor, Board &board);
 	static void validateCastlingMove(Position from, Position to, Color friendlyColor, Game &game);
 
-	static bool isSquareAttacked(Position position, Color friendlyColor, Board &board);
 	static Bitboard xrayAttacks(Bitboard occupied, Bitboard friendlyPieces, int kingSquare, PieceType piece);
 	static Bitboard getObstructedRay(Bitboard ray, Bitboard occupied);
 };
