@@ -211,7 +211,7 @@ SpecialMove Game::getSpecialMove(PieceType piece, Position from, Position to, st
 		return SpecialMove::DOUBLE_PAWN_PUSH;
 	}
 	// En Passant
-	else if (getBoard().getEnPassantTargetSquare().has_value() && capturedPiece.has_value() && capturedPiece.value() == PieceType::PAWN && piece == PieceType::PAWN && abs(from.col - to.col) == 1 && abs(from.row - to.row) == 1)
+	else if (getBoard().getEnPassantTargetSquare().has_value() && capturedPiece.has_value() && capturedPiece.value() == PieceType::PAWN && piece == PieceType::PAWN && abs(from.col - to.col) == 1 && abs(from.row - to.row) == 1 && to == getBoard().getEnPassantTargetSquare().value())
 	{
 		return SpecialMove::EN_PASSANT;
 	}
