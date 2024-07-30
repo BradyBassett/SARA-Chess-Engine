@@ -59,9 +59,9 @@ bool MoveValidator::isSquareAttacked(Board &board, Color friendlyColor, int squa
 	Bitboard occupied = board.getOccupiedBitboard();
 	Color opponentColor = (friendlyColor == Color::WHITE) ? Color::BLACK : Color::WHITE;
 
-	Bitboard enemyRooks = board.getPieceBitboard(PieceType::ROOK, opponentColor);
-	if (enemyRooks.getValue())
+	if (board.getRooks(opponentColor).count > 0)
 	{
+		Bitboard enemyRooks = board.getPieceBitboard(PieceType::ROOK, opponentColor);
 		Bitboard rookAttacks = MagicBitboards::getSliderAttacks(square, occupied, PieceType::ROOK);
 		if (rookAttacks.getValue() & enemyRooks.getValue())
 		{
@@ -69,9 +69,9 @@ bool MoveValidator::isSquareAttacked(Board &board, Color friendlyColor, int squa
 		}
 	}
 
-	Bitboard enemyBishops = board.getPieceBitboard(PieceType::BISHOP, opponentColor);
-	if (enemyBishops.getValue())
+	if (board.getBishops(opponentColor).count > 0)
 	{
+		Bitboard enemyBishops = board.getPieceBitboard(PieceType::BISHOP, opponentColor);
 		Bitboard bishopAttacks = MagicBitboards::getSliderAttacks(square, occupied, PieceType::BISHOP);
 		if (bishopAttacks.getValue() & enemyBishops.getValue())
 		{
@@ -79,9 +79,9 @@ bool MoveValidator::isSquareAttacked(Board &board, Color friendlyColor, int squa
 		}
 	}
 
-	Bitboard enemyQueens = board.getPieceBitboard(PieceType::QUEEN, opponentColor);
-	if (enemyQueens.getValue())
+	if (board.getQueens(opponentColor).count > 0)
 	{
+		Bitboard enemyQueens = board.getPieceBitboard(PieceType::QUEEN, opponentColor);
 		Bitboard queenAttacks = MagicBitboards::getSliderAttacks(square, occupied, PieceType::QUEEN);
 		if (queenAttacks.getValue() & enemyQueens.getValue())
 		{
@@ -89,9 +89,9 @@ bool MoveValidator::isSquareAttacked(Board &board, Color friendlyColor, int squa
 		}
 	}
 
-	Bitboard enemyKnights = board.getPieceBitboard(PieceType::KNIGHT, opponentColor);
-	if (enemyKnights.getValue())
+	if (board.getKnights(opponentColor).count > 0)
 	{
+		Bitboard enemyKnights = board.getPieceBitboard(PieceType::KNIGHT, opponentColor);
 		Bitboard knightAttacks = board.getAttacks(PieceType::KNIGHT, opponentColor, square);
 		if (knightAttacks.getValue() & enemyKnights.getValue())
 		{
@@ -99,9 +99,9 @@ bool MoveValidator::isSquareAttacked(Board &board, Color friendlyColor, int squa
 		}
 	}
 
-	Bitboard enemyPawns = board.getPieceBitboard(PieceType::PAWN, opponentColor);
-	if (enemyPawns.getValue())
+	if (board.getPawns(opponentColor).count > 0)
 	{
+		Bitboard enemyPawns = board.getPieceBitboard(PieceType::PAWN, opponentColor);
 		Bitboard pawnAttacks = board.getAttacks(PieceType::PAWN, opponentColor, square);
 		if (pawnAttacks.getValue() & enemyPawns.getValue())
 		{
@@ -109,9 +109,9 @@ bool MoveValidator::isSquareAttacked(Board &board, Color friendlyColor, int squa
 		}
 	}
 
-	Bitboard enemyKings = board.getPieceBitboard(PieceType::KING, opponentColor);
-	if (enemyKings.getValue())
+	if (board.getKing(opponentColor))
 	{
+		Bitboard enemyKings = board.getPieceBitboard(PieceType::KING, opponentColor);
 		Bitboard kingAttacks = board.getAttacks(PieceType::KING, opponentColor, square);
 		if (kingAttacks.getValue() & enemyKings.getValue())
 		{
