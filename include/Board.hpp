@@ -46,6 +46,7 @@ public:
 	std::string getFenPosition() const;
 	std::string getFenEnPassantTargetSquare() const;
 	void movePiece(Move move);
+	void unmovePiece(Move move);
 
 private:
 	std::array<std::array<Bitboard, 6>, 2> pieceBitboards;

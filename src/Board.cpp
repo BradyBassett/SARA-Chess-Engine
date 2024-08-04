@@ -396,6 +396,100 @@ void Board::movePiece(Move move)
 	}
 }
 
+void Board::unmovePiece(Move move)
+{
+	Position from = move.getFrom();
+	PieceType piece = move.getPieceType();
+	Color color = move.getColor();
+	Position to = move.getTo();
+	SpecialMove specialMove = move.getSpecialMove();
+
+	// Clear the piece bitboard from the to square and update the piece list
+	if (specialMove == SpecialMove::PROMOTION)
+	{
+		// Add the pawn back to the piece list
+		pawns[static_cast<int>(color)].addPiece(Utility::calculateSquareNumber(from));
+
+		// Remove the promoted piece from the piece list and clear the piece bitboard
+		switch (move.getPromotionPiece())
+		{
+			case PromotionPiece::QUEEN:
+			{
+				queens[static_cast<int>(color)].removePiece(Utility::calculateSquareNumber(to));
+				setPieceBitboard(PieceType::QUEEN, color, getPieceBitboard(PieceType::QUEEN, color) & ~Bitboard(to));
+				break;
+			}
+			case PromotionPiece::ROOK:
+			{
+				rooks[static_cast<int>(color)].removePiece(Utility::calculateSquareNumber(to));
+				setPieceBitboard(PieceType::ROOK, color, getPieceBitboard(PieceType::ROOK, color) & ~Bitboard(to));
+				break;
+			}
+			case PromotionPiece::BISHOP:
+			{
+				bishops[static_cast<int>(color)].removePiece(Utility::calculateSquareNumber(to));
+				setPieceBitboard(PieceType::BISHOP, color, getPieceBitboard(PieceType::BISHOP, color) & ~Bitboard(to));
+				break;
+			}
+			case PromotionPiece::KNIGHT:
+			{
+				knights[static_cast<int>(color)].removePiece(Utility::calculateSquareNumber(to));
+				setPieceBitboard(PieceType::KNIGHT, color, getPieceBitboard(PieceType::KNIGHT, color) & ~Bitboard(to));
+				break;
+			}
+			default:
+				break;
+		}
+	}
+	else
+	{
+		// Clear the piece bitboard from the to square and update the piece list
+		setPieceBitboard(piece, color, getPieceBitboard(piece, color) & ~Bitboard(to));
+		updatePieceList(piece, color, Utility::calculateSquareNumber(to), Utility::calculateSquareNumber(from), false);
+	}
+
+	// Set the piece bitboard back on the from square
+	setPieceBitboard(piece, color, getPieceBitboard(piece, color) | Bitboard(from));
+
+	// If a piece was captured, set the captured piece bitboard and update the piece list
+	std::optional<PieceType> capturedPiece = move.getCapturedPiece();
+	if (capturedPiece.has_value())
+	{
+		Color capturedPieceColor = color == Color::WHITE ? Color::BLACK : Color::WHITE;
+		Bitboard capturedPieceBitboard = getPieceBitboard(capturedPiece.value(), capturedPieceColor);
+		Position capturedPiecePosition = to;
+
+		if (specialMove == SpecialMove::EN_PASSANT)
+		{
+			capturedPiecePosition = Position{to.row + (color == Color::WHITE ? -1 : 1), to.col};
+			setEnPassantTargetSquare(move.getEnPassantTargetSquare().value());
+		}
+
+		setPieceBitboard(capturedPiece.value(), capturedPieceColor, capturedPieceBitboard | Bitboard(capturedPiecePosition));
+		updatePieceList(capturedPiece.value(), capturedPieceColor, Utility::calculateSquareNumber(capturedPiecePosition), Utility::calculateSquareNumber(capturedPiecePosition), false);
+	}
+
+	// Undo DOUBLE_PAWN_PUSH en passant target square
+	if (specialMove == SpecialMove::DOUBLE_PAWN_PUSH)
+	{
+		setEnPassantTargetSquare(std::nullopt);
+	}
+
+	if (specialMove == SpecialMove::KINGSIDE_CASTLE || specialMove == SpecialMove::QUEENSIDE_CASTLE)
+	{
+		// Move the appropriate rook
+		Position rookFrom = Position{from.row, (specialMove == SpecialMove::KINGSIDE_CASTLE ? 5 : 3)};
+		Position rookTo = Position{from.row, (specialMove == SpecialMove::KINGSIDE_CASTLE ? 7 : 0)};
+
+		// Clear the rook bitboard from the to square and set it on the to square
+		setPieceBitboard(PieceType::ROOK, color, getPieceBitboard(PieceType::ROOK, color) & ~Bitboard(rookFrom));
+		setPieceBitboard(PieceType::ROOK, color, getPieceBitboard(PieceType::ROOK, color) | Bitboard(rookTo));
+
+		// Update the rook piece list
+		updatePieceList(PieceType::ROOK, color, Utility::calculateSquareNumber(rookFrom), Utility::calculateSquareNumber(rookTo), false);
+	}
+}
+
 void Board::initializePieceLists()
 {
 	for (int color = 0; color < 2; color++)
