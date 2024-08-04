@@ -19,14 +19,19 @@ public:
 	Color getActiveColor() const;
 	void setActiveColor(Color activeColor);
 	Board &getBoard();
+	std::string getFen();
 	int getHalfMoveClock() const;
 	void setHalfMoveClock(int halfMoveClock);
 	int getFullMoveNumber() const;
 	void setFullMoveNumber(int fullMoveNumber);
 	CastleRights getWhiteCastleRights() const;
 	CastleRights getBlackCastleRights() const;
+	Move getLastMove() const;
 
 	void makeMove(Position from, Position to, PromotionPiece promotionPiece);
+	void unmakeMove();
+
+	std::vector<std::string> getFenTokens(std::string fen);
 
 private:
 	Color activeColor;
@@ -39,7 +44,6 @@ private:
 	bool cachedInCheckValue;
 	bool hasCachedInCheckValue;
 
-	std::vector<std::string> getFenTokens(std::string fen);
 	void parseActiveColor(std::string color);
 	void parsehalfMoveClock(std::string halfMoveClock);
 	void parseFullMoveNumber(std::string fullMoveNumber);

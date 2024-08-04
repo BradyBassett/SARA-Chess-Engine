@@ -1,5 +1,6 @@
 #include "../include/Game.hpp"
 #include "../include/MoveValidator.hpp"
+#include "../include/Utility.hpp"
 
 #include <sstream>
 
@@ -28,6 +29,37 @@ void Game::setActiveColor(Color activeColor)
 Board &Game::getBoard()
 {
 	return board;
+}
+
+std::string Game::getFen()
+{
+	std::string fen = board.getFenPosition() + " ";
+	fen += activeColor == Color::WHITE ? "w" : "b";
+	fen += " ";
+	if (whiteCastleRights.canCastleKingSide())
+	{
+		fen += "K";
+	}
+	if (whiteCastleRights.canCastleQueenSide())
+	{
+		fen += "Q";
+	}
+	if (blackCastleRights.canCastleKingSide())
+	{
+		fen += "k";
+	}
+	if (blackCastleRights.canCastleQueenSide())
+	{
+		fen += "q";
+	}
+	fen += " ";
+	fen += board.getEnPassantTargetSquare().has_value() ? Utility::convertPositionToString(board.getEnPassantTargetSquare().value()) : "-";
+	fen += " ";
+	fen += std::to_string(halfMoveClock);
+	fen += " ";
+	fen += std::to_string(fullMoveNumber);
+
+	return fen;
 }
 
 int Game::getHalfMoveClock() const
@@ -60,7 +92,16 @@ CastleRights Game::getBlackCastleRights() const
 	return blackCastleRights;
 }
 
-// TODO: eventually add support for check
+Move Game::getLastMove() const
+{
+	if (moveHistory.size() == 0)
+	{
+		throw std::invalid_argument("No moves have been made");
+	}
+
+	return moveHistory.back();
+}
+
 void Game::makeMove(Position from, Position to, PromotionPiece promotionPiece)
 {
 	if (!board.getPiece(from, activeColor).has_value())
@@ -82,6 +123,13 @@ void Game::makeMove(Position from, Position to, PromotionPiece promotionPiece)
 	// Move piece
 	board.movePiece(move);
 
+	// Check if king is in check
+	if (isInCheck())
+	{
+		unmakeMove();
+		throw std::invalid_argument("Move puts king in check");
+	}
+
 	// Update castling rights
 	updateCastlingRights(piece, activeColor, from);
 
@@ -101,7 +149,35 @@ void Game::makeMove(Position from, Position to, PromotionPiece promotionPiece)
 		fullMoveNumber++;
 	}
 
+	hasCachedInCheckValue = false;
 	switchActiveColor();
+}
+
+void Game::unmakeMove()
+{
+	if (moveHistory.size() == 0)
+	{
+		throw std::invalid_argument("No moves to undo");
+	}
+
+	// Get move details from history and remove move from history
+	Move move = moveHistory.back();
+	moveHistory.pop_back();
+
+	// Undo board move details
+	board.unmovePiece(move);
+
+	// Undo castling rights
+	blackCastleRights = move.getBlackCastleRights();
+	whiteCastleRights = move.getWhiteCastleRights();
+
+	// Undo half move clock and full move number
+	halfMoveClock = move.getHalfMoveClock();
+	fullMoveNumber = move.getFullMoveNumber();
+
+	// Switch active color to the color that made the move
+	activeColor = move.getColor();
+	hasCachedInCheckValue = false;
 }
 
 std::vector<std::string> Game::getFenTokens(std::string fen)
