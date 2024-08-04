@@ -211,6 +211,11 @@ void Move::setFullMoveNumber(uint16_t fullMoveNumber)
 	move = encode(FULL_MOVE_NUMBER_MASK, FULL_MOVE_NUMBER_SHIFT, fullMoveNumber);
 }
 
+bool Move::operator==(const Move &other) const
+{
+	return move == other.move;
+}
+
 uint64_t Move::decode(uint64_t mask, uint8_t shift) const
 {
 	return (move & mask) >> shift;

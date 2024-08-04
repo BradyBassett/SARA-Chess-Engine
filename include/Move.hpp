@@ -44,6 +44,9 @@ public:
 	uint16_t getFullMoveNumber() const;
 	void setFullMoveNumber(uint16_t fullMoveNumber);
 
+	bool operator==(const Move &other) const;
+
+
 private:
 	uint64_t move;
 
