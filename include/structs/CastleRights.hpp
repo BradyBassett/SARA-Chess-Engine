@@ -18,6 +18,11 @@ struct CastleRights
 		return queenSide;
 	}
 
+	bool canCastle() const
+	{
+		return kingSide || queenSide;
+	}
+
 	void disable()
 	{
 		kingSide = false;
