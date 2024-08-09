@@ -52,6 +52,11 @@ std::string Game::getFen()
 	{
 		fen += "q";
 	}
+	if (!blackCastleRights.canCastle() && !whiteCastleRights.canCastle())
+	{
+		fen += "-";
+	}
+
 	fen += " ";
 	fen += board.getEnPassantTargetSquare().has_value() ? Utility::convertPositionToString(board.getEnPassantTargetSquare().value()) : "-";
 	fen += " ";
@@ -116,7 +121,7 @@ void Game::makeMove(Position from, Position to, PromotionPiece promotionPiece)
 	// Get move details
 	std::optional<PieceType> capturedPiece = getCapturedPiece(piece, from, to);
 	SpecialMove specialMove = getSpecialMove(piece, from, to, capturedPiece, promotionPiece);
-	std::optional<Position> enPassantTargetSquare = getEnPassantTargetSquare(piece, from, to, specialMove);
+	std::optional<Position> enPassantTargetSquare = board.getEnPassantTargetSquare();
 	Move move = Move(from, to, piece, activeColor, capturedPiece, enPassantTargetSquare, specialMove, promotionPiece, whiteCastleRights, blackCastleRights, halfMoveClock, fullMoveNumber);
 	addMoveToHistory(move);
 
