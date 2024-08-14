@@ -1,7 +1,8 @@
 #include "../include/Utility.hpp"
 #include <stdexcept>
 
-namespace Utility {
+namespace Utility
+{
     int calculateSquareNumber(Position position)
     {
         validatePosition(position);

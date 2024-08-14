@@ -6,7 +6,8 @@
 #include <array>
 #include <string>
 
-namespace Utility {
+namespace Utility
+{
     int calculateSquareNumber(Position position);
     Position calculatePosition(int squareNumber);
     bool isValidPosition(Position position);
