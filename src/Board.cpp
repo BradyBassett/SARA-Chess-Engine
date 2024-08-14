@@ -461,7 +461,7 @@ void Board::unmovePiece(Move move)
 
 		if (specialMove == SpecialMove::EN_PASSANT)
 		{
-			capturedPiecePosition = Position{to.row + (color == Color::WHITE ? -1 : 1), to.col};
+			capturedPiecePosition = Position{to.row + (color == Color::WHITE ? 1 : -1), to.col};
 			setEnPassantTargetSquare(move.getEnPassantTargetSquare().value());
 		}
 
