@@ -53,6 +53,30 @@ INSTANTIATE_TEST_SUITE_P(GameConstructorTests, GameConstructorTest, gameConstruc
 // TODO: Add tests for makeMove
 // ? use this fen: r1bq1rk1/1pp2ppp/p4n2/2bpp3/B2nP3/2NPBP2/PPP3PP/R2QK1NR w KQ d6 0 9 and the move e4 d5, getting bad optional access?
 
+namespace MoveTest
+{
+	Color getActiveColorFromFen(std::string color)
+	{
+		return color == "w" ? Color::WHITE : Color::BLACK;
+	}
+
+	CastleRights getCastleRightsFromFen(std::string castleRights, Color color)
+	{
+		bool canCastleKingside = castleRights.find(color == Color::WHITE ? 'K' : 'k') != std::string::npos;
+		bool canCastleQueenside = castleRights.find(color == Color::WHITE ? 'Q' : 'q') != std::string::npos;
+		return CastleRights(canCastleKingside, canCastleQueenside);
+	}
+
+	std::optional<Position> getEnPassantTargetSquareFromFen(std::string enPassantTargetSquare)
+	{
+		if (enPassantTargetSquare == "-")
+		{
+			return std::nullopt;
+		}
+		return Utility::convertStringToPosition(enPassantTargetSquare);
+		}
+}
+
 struct GameMakeMoveTestParams
 {
 	std::string fen;
@@ -70,35 +94,14 @@ class GameMakeMoveTest : public ::testing::TestWithParam<GameMakeMoveTestParams>
 		Move composeMove(std::vector<std::string> fenParts, Position from, Position to, PromotionPiece promotionPiece, PieceType pieceType, std::optional<PieceType> capturedPiece, SpecialMove specialMove)
 		{
 			// Because the active color is switched after the move
-			Color activeColor = getActiveColorFromFen(fenParts[1]);
-			CastleRights whiteCastleRights(getCastleRightsFromFen(fenParts[2], Color::WHITE));
-			CastleRights blackCastleRights(getCastleRightsFromFen(fenParts[2], Color::BLACK));
-			std::optional<Position> enPassantSquare = getEnPassantTargetSquareFromFen(fenParts[3]);
+			Color activeColor = MoveTest::getActiveColorFromFen(fenParts[1]);
+			CastleRights whiteCastleRights(MoveTest::getCastleRightsFromFen(fenParts[2], Color::WHITE));
+			CastleRights blackCastleRights(MoveTest::getCastleRightsFromFen(fenParts[2], Color::BLACK));
+			std::optional<Position> enPassantSquare = MoveTest::getEnPassantTargetSquareFromFen(fenParts[3]);
 			uint8_t halfMoveClock = std::stoi(fenParts[4]);
 			uint8_t fullMoveNumber = std::stoi(fenParts[5]);
 
 			return Move{from, to, pieceType, activeColor, capturedPiece, enPassantSquare, specialMove, promotionPiece, whiteCastleRights, blackCastleRights, halfMoveClock, fullMoveNumber};
-		}
-
-		Color getActiveColorFromFen(std::string color)
-		{
-			return color == "w" ? Color::WHITE : Color::BLACK;
-		}
-
-		CastleRights getCastleRightsFromFen(std::string castleRights, Color color)
-		{
-			bool canCastleKingside = castleRights.find(color == Color::WHITE ? 'K' : 'k') != std::string::npos;
-			bool canCastleQueenside = castleRights.find(color == Color::WHITE ? 'Q' : 'q') != std::string::npos;
-			return CastleRights(canCastleKingside, canCastleQueenside);
-		}
-
-		std::optional<Position> getEnPassantTargetSquareFromFen(std::string enPassantTargetSquare)
-		{
-			if (enPassantTargetSquare == "-")
-			{
-				return std::nullopt;
-			}
-			return Utility::convertStringToPosition(enPassantTargetSquare);
 		}
 };
 
@@ -133,10 +136,10 @@ TEST_P(GameMakeMoveTest, GameMakeMove)
 	EXPECT_EQ(actualMove, expectedMove);
 
 	EXPECT_EQ(game.getFen(), params.expectedFen);
-	EXPECT_EQ(game.getActiveColor(), getActiveColorFromFen(fenParts[1]));
-	EXPECT_EQ(game.getWhiteCastleRights(), getCastleRightsFromFen(fenParts[2], Color::WHITE));
-	EXPECT_EQ(game.getBlackCastleRights(), getCastleRightsFromFen(fenParts[2], Color::BLACK));
-	EXPECT_EQ(game.getBoard().getEnPassantTargetSquare(), getEnPassantTargetSquareFromFen(fenParts[3]));
+	EXPECT_EQ(game.getActiveColor(), MoveTest::getActiveColorFromFen(fenParts[1]));
+	EXPECT_EQ(game.getWhiteCastleRights(), MoveTest::getCastleRightsFromFen(fenParts[2], Color::WHITE));
+	EXPECT_EQ(game.getBlackCastleRights(), MoveTest::getCastleRightsFromFen(fenParts[2], Color::BLACK));
+	EXPECT_EQ(game.getBoard().getEnPassantTargetSquare(), MoveTest::getEnPassantTargetSquareFromFen(fenParts[3]));
 	EXPECT_EQ(game.getHalfMoveClock(), std::stoi(fenParts[4]));
 	EXPECT_EQ(game.getFullMoveNumber(), std::stoi(fenParts[5]));
 }
@@ -173,37 +176,108 @@ const auto gameMakeMoveTestParams = ::testing::Values(
 	GameMakeMoveTestParams{"rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", "e7", "e5", PromotionPiece::NONE, PieceType::PAWN, std::nullopt, SpecialMove::DOUBLE_PAWN_PUSH, "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2"},
 	// En passant
 	GameMakeMoveTestParams{"rnbqkbnr/pppp1ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 1", "d5", "e6", PromotionPiece::NONE, PieceType::PAWN, PieceType::PAWN, SpecialMove::EN_PASSANT, "rnbqkbnr/pppp1ppp/4P3/8/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"},
-	GameMakeMoveTestParams{"rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", "d4", "e3", PromotionPiece::NONE, PieceType::PAWN, PieceType::PAWN, SpecialMove::EN_PASSANT, "rnbqkbnr/ppp1pppp/8/8/8/4p3/PPPP1PPP/RNBQKBNR w KQkq - 0 2"}
-
+	GameMakeMoveTestParams{"rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", "d4", "e3", PromotionPiece::NONE, PieceType::PAWN, PieceType::PAWN, SpecialMove::EN_PASSANT, "rnbqkbnr/ppp1pppp/8/8/8/4p3/PPPP1PPP/RNBQKBNR w KQkq - 0 2"},
+	// Castling
+	GameMakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQkq - 0 1", "e1", "g1", PromotionPiece::NONE, PieceType::KING, std::nullopt, SpecialMove::KINGSIDE_CASTLE, "r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R4RK1 b kq - 1 1"},
+	GameMakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQkq - 0 1", "e1", "c1", PromotionPiece::NONE, PieceType::KING, std::nullopt, SpecialMove::QUEENSIDE_CASTLE, "r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/2KR3R b kq - 1 1"},
+	GameMakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R b KQkq - 0 1", "e8", "g8", PromotionPiece::NONE, PieceType::KING, std::nullopt, SpecialMove::KINGSIDE_CASTLE, "r4rk1/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQ - 1 2"},
+	GameMakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R b KQkq - 0 1", "e8", "c8", PromotionPiece::NONE, PieceType::KING, std::nullopt, SpecialMove::QUEENSIDE_CASTLE, "2kr3r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQ - 1 2"},
+	// Promotion
+	GameMakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::BISHOP, PieceType::PAWN, std::nullopt, SpecialMove::PROMOTION, "1B1nk2r/p2bpppp/8/8/8/8/4P2P/4KBNR b Kk - 0 1"},
+	GameMakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::KNIGHT, PieceType::PAWN, std::nullopt, SpecialMove::PROMOTION, "1N1nk2r/p2bpppp/8/8/8/8/4P2P/4KBNR b Kk - 0 1"},
+	GameMakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::ROOK, PieceType::PAWN, std::nullopt, SpecialMove::PROMOTION, "1R1nk2r/p2bpppp/8/8/8/8/4P2P/4KBNR b Kk - 0 1"},
+	GameMakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::QUEEN, PieceType::PAWN, std::nullopt, SpecialMove::PROMOTION, "1Q1nk2r/p2bpppp/8/8/8/8/4P2P/4KBNR b Kk - 0 1"},
+	GameMakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::BISHOP, PieceType::PAWN, std::nullopt, SpecialMove::PROMOTION, "4kbnr/pr1ppppp/8/8/8/8/P2PPPPP/1b1BK1NR w K - 0 2"},
+	GameMakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::KNIGHT, PieceType::PAWN, std::nullopt, SpecialMove::PROMOTION, "4kbnr/pr1ppppp/8/8/8/8/P2PPPPP/1n1BK1NR w K - 0 2"},
+	GameMakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::ROOK, PieceType::PAWN, std::nullopt, SpecialMove::PROMOTION, "4kbnr/pr1ppppp/8/8/8/8/P2PPPPP/1r1BK1NR w K - 0 2"},
+	GameMakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::QUEEN, PieceType::PAWN, std::nullopt, SpecialMove::PROMOTION, "4kbnr/pr1ppppp/8/8/8/8/P2PPPPP/1q1BK1NR w K - 0 2"}
 );
 
 INSTANTIATE_TEST_SUITE_P(GameMakeMoveTests, GameMakeMoveTest, gameMakeMoveTestParams);
 
-// struct GameUnmakeMoveTestParams
-// {
-// 	std::string fen;
-// 	std::string expectedFen;
-// };
+struct GameUnmakeMoveTestParams
+{
+	std::string fen;
+	std::string from;
+	std::string to;
+	PromotionPiece promotionPiece;
+};
 
-// class GameUnmakeMoveTest : public ::testing::TestWithParam<GameUnmakeMoveTestParams> {};
+class GameUnmakeMoveTest : public ::testing::TestWithParam<GameUnmakeMoveTestParams> {};
 
-// TEST_P(GameUnmakeMoveTest, GameUnmakeMove)
-// {
-// 	auto params = GetParam();
-// 	Game game(params.fen);
-// 	Board &board = game.getBoard();
+TEST_P(GameUnmakeMoveTest, GameUnmakeMove)
+{
+	auto params = GetParam();
 
-// 	game.makeMove();
-// 	game.unmakeMove();
+	Position from = Utility::convertStringToPosition(params.from);
+	Position to = Utility::convertStringToPosition(params.to);
 
-// 	EXPECT_EQ(game.getBoard().getFenPosition(), params.expectedFen);
-// }
+	Game game(params.fen);
+	Board &board = game.getBoard();
+	std::vector<std::string> fenParts = game.getFenTokens(params.fen);
 
-// auto gameUnmakeMoveTestParams = ::testing::Values(
+	game.makeMove(from, to, params.promotionPiece);
+	game.unmakeMove();
 
-// );
+	EXPECT_EQ(game.getFen(), params.fen);
+	EXPECT_EQ(game.getActiveColor(), MoveTest::getActiveColorFromFen(fenParts[1]));
+	EXPECT_EQ(game.getWhiteCastleRights(), MoveTest::getCastleRightsFromFen(fenParts[2], Color::WHITE));
+	EXPECT_EQ(game.getBlackCastleRights(), MoveTest::getCastleRightsFromFen(fenParts[2], Color::BLACK));
+	EXPECT_EQ(game.getBoard().getEnPassantTargetSquare(), MoveTest::getEnPassantTargetSquareFromFen(fenParts[3]));
+	EXPECT_EQ(game.getHalfMoveClock(), std::stoi(fenParts[4]));
+	EXPECT_EQ(game.getFullMoveNumber(), std::stoi(fenParts[5]));
+}
 
-// INSTANTIATE_TEST_SUITE_P(GameUnmakeMoveTests, GameUnmakeMoveTest, gameUnmakeMoveTestParams);
+auto gameUnmakeMoveTestParams = ::testing::Values(
+	// Non capturing ordinary moves
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "h6", "h7", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "e2", "f1", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "f6", "e8", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "c3", "c5", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "c8", "h8", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "d7", "c7", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "d4", "d3", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "c6", "a4", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "h2", "g4", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "a7", "a3", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "e6", "c8", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "b2", "a1", PromotionPiece::NONE},
+	// Ordinary capturing moves
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "d5", "c6", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "e8", "c6", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "a2", "b4", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "e5", "h5", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "a8", "a4", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/1q6 w - - 0 1", "c7", "c6", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "c6", "d5", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "d2", "h6", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "d6", "e8", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "h8", "g8", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "b2", "e5", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "f8", "e8", PromotionPiece::NONE},
+	// Double pawn push
+	GameUnmakeMoveTestParams{"R1n3bk/N1pP4/8/B3p3/P4n2/3P3p/2P5/1Q5K w - - 0 1", "c2", "c4", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"R1n3bk/N1pP4/8/B3p3/P4n2/3P3p/2P5/1Q5K b - - 0 1", "c7", "c5", PromotionPiece::NONE},
+	// En passant
+	GameUnmakeMoveTestParams{"rnbqkbnr/p1pppppp/8/1pP5/8/8/PPPPP1PP/RNBQKBNR w KQkq b6 0 1", "c5", "b6", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"rnbqkbnr/ppp1pppp/8/8/2Pp4/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1", "d4", "c3", PromotionPiece::NONE},
+	// Castling
+	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQkq - 0 1", "e1", "g1", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQkq - 0 1", "e1", "c1", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R b KQkq - 0 1", "e8", "g8", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R b KQkq - 0 1", "e8", "c8", PromotionPiece::NONE},
+	// Promotion
+	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::BISHOP},
+	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::KNIGHT},
+	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::ROOK},
+	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::QUEEN},
+	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::BISHOP},
+	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::KNIGHT},
+	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::ROOK},
+	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::QUEEN}
+);
+
+INSTANTIATE_TEST_SUITE_P(GameUnmakeMoveTests, GameUnmakeMoveTest, gameUnmakeMoveTestParams);
 
 TEST(GameUnmakeMoveTest, GameUnmakeMoveEmptyHistory)
 {
