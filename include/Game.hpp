@@ -42,7 +42,7 @@ private:
 	CastleRights whiteCastleRights;
 	CastleRights blackCastleRights;
 	bool cachedInCheckValue;
-	bool hasCachedInCheckValue;
+	bool hasCachedInCheckValue = false;
 
 	void parseActiveColor(std::string color);
 	void parsehalfMoveClock(std::string halfMoveClock);
