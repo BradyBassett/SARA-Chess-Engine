@@ -185,6 +185,101 @@ void Game::unmakeMove()
 	hasCachedInCheckValue = false;
 }
 
+uint64_t Game::perft(int depth)
+{
+	if (depth == 0)
+	{
+		return 1;
+	}
+
+	uint64_t nodes = 0;
+	std::vector<Move> moves = generateLegalMoves();
+
+	for (Move move : moves)
+	{
+		makeMove(move.getFrom(), move.getTo(), move.getPromotionPiece());
+		nodes += perft(depth - 1);
+		unmakeMove();
+	}
+
+	return nodes;
+}
+
+void Game::perftRoot(int depth, std::map<std::string, int> &output)
+{
+    uint64_t totalNodes = 0;
+    std::vector<Move> moves = generateLegalMoves();
+
+    for (Move move : moves)
+    {
+        makeMove(move.getFrom(), move.getTo(), move.getPromotionPiece());
+        uint64_t nodes = perft(depth - 1);
+        unmakeMove();
+
+		std::string moveString = Utility::convertPositionToString(move.getFrom()) + Utility::convertPositionToString(move.getTo());
+
+		output[moveString] = nodes;
+        totalNodes += nodes;
+    }
+
+	output["Nodes"] = totalNodes;
+}
+
+std::vector<Move> Game::generateLegalMoves()
+{
+	std::vector<Move> moves;
+
+	for (int square = 0; square < 64; square++)
+	{
+		// Get piece at square for active color
+		Position from = Utility::calculatePosition(square);
+		std::optional<PieceType> piece = board.getPiece(from, activeColor);
+		if (!piece.has_value())
+		{
+			continue;
+		}
+
+		// Loop through potential moves
+		Bitboard potentialMoves = MoveValidator::generatePotentialMoves(from, piece.value(), activeColor, board);
+		while (potentialMoves.getValue())
+		{
+			// Get to square and remove from potential moves
+			int toSquare = potentialMoves.bitScanForward();
+			Position to = Utility::calculatePosition(toSquare);
+			potentialMoves.clearBit(toSquare);
+
+			// If move is invalid, continue
+			if (!isValidMove(from, to, piece.value()))
+			{
+				continue;
+			}
+
+			// If move puts friendly king in check, continue
+			if (movePutsKingInCheck(from, to, piece.value()))
+			{
+				continue;
+			}
+
+			// Get move details
+			if (piece.value() == PieceType::PAWN && (to.row == 0 || to.row == 7))
+			{
+				for (PromotionPiece promotionPiece : {PromotionPiece::QUEEN, PromotionPiece::ROOK, PromotionPiece::BISHOP, PromotionPiece::KNIGHT})
+				{
+					Move move = composeMove(from, to, piece.value(), promotionPiece, whiteCastleRights, blackCastleRights, halfMoveClock, fullMoveNumber);
+					moves.push_back(move);
+				}
+			}
+			else
+			{
+				Move move = composeMove(from, to, piece.value(), PromotionPiece::NONE, whiteCastleRights, blackCastleRights, halfMoveClock, fullMoveNumber);
+				moves.push_back(move);
+			}
+		}
+	}
+
+	return moves;
+}
+
 std::vector<std::string> Game::getFenTokens(std::string fen)
 {
 	std::vector<std::string> parts;
@@ -374,4 +469,35 @@ bool Game::isInCheck()
 	hasCachedInCheckValue = true;
 
 	return cachedInCheckValue;
+}
+
+bool Game::isValidMove(Position from, Position to, PieceType piece)
+{
+	try
+	{
+		MoveValidator::validateMove(from, to, piece, activeColor, *this);
+		return true;
+	}
+	catch(const std::exception& e)
+	{
+		return false;
+	}
+}
+
+bool Game::movePutsKingInCheck(Position from, Position to, PieceType piece)
+{
+	makeMove(from, to, PromotionPiece::NONE);
+	bool putsKingInCheck = isInCheck();
+	unmakeMove();
+
+	return putsKingInCheck;
+}
+
+Move Game::composeMove(Position from, Position to, PieceType piece, PromotionPiece promotionPiece, CastleRights whiteCastleRights, CastleRights blackCastleRights, int halfMoveClock, int fullMoveNumber)
+{
+	std::optional<PieceType> capturedPiece = getCapturedPiece(piece, from, to);
+	SpecialMove specialMove = getSpecialMove(piece, from, to, capturedPiece, PromotionPiece::NONE);
+	std::optional<Position> enPassantTargetSquare = board.getEnPassantTargetSquare();
+
+	return Move(from, to, piece, activeColor, capturedPiece, enPassantTargetSquare, specialMove, promotionPiece, whiteCastleRights, blackCastleRights, halfMoveClock, fullMoveNumber);
 }

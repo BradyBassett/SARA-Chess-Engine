@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include <unordered_map>
+#include <map>
 
 #include "Board.hpp"
 #include "Move.hpp"
@@ -30,6 +30,9 @@ public:
 
 	void makeMove(Position from, Position to, PromotionPiece promotionPiece);
 	void unmakeMove();
+	uint64_t perft(int depth);
+	void perftRoot(int depth, std::map<std::string, int> &output);
+	std::vector<Move> generateLegalMoves();
 
 	std::vector<std::string> getFenTokens(std::string fen);
 
@@ -57,6 +60,9 @@ private:
 	std::optional<Position> getEnPassantTargetSquare(PieceType piece, Position from, Position to, SpecialMove specialMove);
 	void updateCastlingRights(PieceType piece, Color color, Position from);
 	bool isInCheck();
+	bool isValidMove(Position from, Position to, PieceType piece);
+	bool movePutsKingInCheck(Position from, Position to, PieceType piece);
+	Move composeMove(Position from, Position to, PieceType piece, PromotionPiece promotionPiece, CastleRights whiteCastleRights, CastleRights blackCastleRights, int halfMoveClock, int fullMoveNumber);
 };
 
 #endif // GAME_HPP
