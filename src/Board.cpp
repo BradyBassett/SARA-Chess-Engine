@@ -466,7 +466,9 @@ void Board::unmovePiece(Move move)
 		}
 
 		setPieceBitboard(capturedPiece.value(), capturedPieceColor, capturedPieceBitboard | Bitboard(capturedPiecePosition));
-		updatePieceList(capturedPiece.value(), capturedPieceColor, Utility::calculateSquareNumber(capturedPiecePosition), Utility::calculateSquareNumber(capturedPiecePosition), false);
+		PieceList capturedPieceList = getPieceList(capturedPiece.value(), capturedPieceColor);
+		capturedPieceList.addPiece(Utility::calculateSquareNumber(capturedPiecePosition));
+		setPieceList(capturedPiece.value(), capturedPieceColor, capturedPieceList);
 	}
 
 	// Undo DOUBLE_PAWN_PUSH en passant target square
