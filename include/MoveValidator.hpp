@@ -9,9 +9,9 @@ public:
 	static void validateMove(Position from, Position to, PieceType piece, Color friendlyColor, Game &game);
 	static bool isSquareAttacked(Board &board, Color friendlyColor, int square);
 	static Bitboard findAbsolutePins(Board &board, Color friendlyColor);
+	static Bitboard generatePotentialMoves(Position position, PieceType piece, Color friendlyColor, Board &board);
 
 private:
-	static Bitboard generatePotentialMoves(Position position, PieceType piece, Color friendlyColor, Board &board);
 	static Bitboard generatePotentialPawnMoves(Color friendlyColor, Position position, Bitboard moves, Bitboard occupied);
 	static bool canDoublePawnPush(Color friendlyColor, Position position, Bitboard occupied);
 	static Bitboard generatePotentialKingMoves(Color friendlyColor, Position position, Bitboard moves);
