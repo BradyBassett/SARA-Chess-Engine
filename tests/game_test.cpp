@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <map>
 
 #include "../include/Game.hpp"
 #include "../include/Utility.hpp"
@@ -201,6 +202,11 @@ struct GameUnmakeMoveTestParams
 	std::string from;
 	std::string to;
 	PromotionPiece promotionPiece;
+	std::array<int, 2> expectedPawnCounts;
+	std::array<int, 2> expectedBishopCounts;
+	std::array<int, 2> expectedKnightCounts;
+	std::array<int, 2> expectedRookCounts;
+	std::array<int, 2> expectedQueenCounts;
 };
 
 class GameUnmakeMoveTest : public ::testing::TestWithParam<GameUnmakeMoveTestParams> {};
@@ -226,55 +232,67 @@ TEST_P(GameUnmakeMoveTest, GameUnmakeMove)
 	EXPECT_EQ(game.getBoard().getEnPassantTargetSquare(), MoveTest::getEnPassantTargetSquareFromFen(fenParts[3]));
 	EXPECT_EQ(game.getHalfMoveClock(), std::stoi(fenParts[4]));
 	EXPECT_EQ(game.getFullMoveNumber(), std::stoi(fenParts[5]));
+
+	// Validate piece counts
+	EXPECT_EQ(board.getPawns(Color::WHITE).count, params.expectedPawnCounts[0]);
+	EXPECT_EQ(board.getPawns(Color::BLACK).count, params.expectedPawnCounts[1]);
+	EXPECT_EQ(board.getBishops(Color::WHITE).count, params.expectedBishopCounts[0]);
+	EXPECT_EQ(board.getBishops(Color::BLACK).count, params.expectedBishopCounts[1]);
+	EXPECT_EQ(board.getKnights(Color::WHITE).count, params.expectedKnightCounts[0]);
+	EXPECT_EQ(board.getKnights(Color::BLACK).count, params.expectedKnightCounts[1]);
+	EXPECT_EQ(board.getRooks(Color::WHITE).count, params.expectedRookCounts[0]);
+	EXPECT_EQ(board.getRooks(Color::BLACK).count, params.expectedRookCounts[1]);
+	EXPECT_EQ(board.getQueens(Color::WHITE).count, params.expectedQueenCounts[0]);
+	EXPECT_EQ(board.getQueens(Color::BLACK).count, params.expectedQueenCounts[1]);
 }
 
 auto gameUnmakeMoveTestParams = ::testing::Values(
 	// Non capturing ordinary moves
-	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "h6", "h7", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "e2", "f1", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "f6", "e8", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "c3", "c5", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "c8", "h8", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "d7", "c7", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "d4", "d3", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "c6", "a4", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "h2", "g4", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "a7", "a3", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "e6", "c8", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "b2", "a1", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "h6", "h7", PromotionPiece::NONE, {2, 3}, {1, 2}, {1, 2}, {1, 2}, {1, 0}},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "e2", "f1", PromotionPiece::NONE, {2, 3}, {1, 2}, {1, 2}, {1, 2}, {1, 0}},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "f6", "e8", PromotionPiece::NONE, {2, 3}, {1, 2}, {1, 2}, {1, 2}, {1, 0}},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "c3", "c5", PromotionPiece::NONE, {2, 3}, {1, 2}, {1, 2}, {1, 2}, {1, 0}},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "c8", "h8", PromotionPiece::NONE, {2, 3}, {1, 2}, {1, 2}, {1, 2}, {1, 0}},
+	GameUnmakeMoveTestParams{"2Q5/p2K4/1r3N1P/p2b2pr/7n/2R1n3/2P1B3/k5b1 w - - 0 1", "d7", "c7", PromotionPiece::NONE, {2, 3}, {1, 2}, {1, 2}, {1, 2}, {1, 0}},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "d4", "d3", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "c6", "a4", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "h2", "g4", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "a7", "a3", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "e6", "c8", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "b2", "a1", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
 	// Ordinary capturing moves
-	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "d5", "c6", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "e8", "c6", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "a2", "b4", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "e5", "h5", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "a8", "a4", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/1q6 w - - 0 1", "c7", "c6", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "c6", "d5", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "d2", "h6", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "d6", "e8", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "h8", "g8", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "b2", "e5", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "f8", "e8", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "d5", "c6", PromotionPiece::NONE, {2, 5}, {2, 0}, {1, 1}, {1, 1}, {1, 1}},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "e8", "c6", PromotionPiece::NONE, {2, 5}, {2, 0}, {1, 1}, {1, 1}, {1, 1}},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "a2", "b4", PromotionPiece::NONE, {2, 5}, {2, 0}, {1, 1}, {1, 1}, {1, 1}},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "e5", "h5", PromotionPiece::NONE, {2, 5}, {2, 0}, {1, 1}, {1, 1}, {1, 1}},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "a8", "a4", PromotionPiece::NONE, {2, 5}, {2, 0}, {1, 1}, {1, 1}, {1, 1}},
+	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/1q6 w - - 0 1", "c7", "c6", PromotionPiece::NONE, {2, 5}, {2, 0}, {1, 1}, {1, 1}, {1, 1}},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "c6", "d5", PromotionPiece::NONE, {2, 5}, {2, 1}, {0, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "d2", "h6", PromotionPiece::NONE, {2, 5}, {2, 1}, {0, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "d6", "e8", PromotionPiece::NONE, {2, 5}, {2, 1}, {0, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "h8", "g8", PromotionPiece::NONE, {2, 5}, {2, 1}, {0, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "b2", "e5", PromotionPiece::NONE, {2, 5}, {2, 1}, {0, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"4BkBr/K7/2pn3R/3PP2p/pp6/1p6/1q1b4/8 b - - 0 1", "f8", "e8", PromotionPiece::NONE, {2, 5}, {2, 1}, {0, 1}, {1, 1}, {0, 1}},
 	// Double pawn push
-	GameUnmakeMoveTestParams{"R1n3bk/N1pP4/8/B3p3/P4n2/3P3p/2P5/1Q5K w - - 0 1", "c2", "c4", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"R1n3bk/N1pP4/8/B3p3/P4n2/3P3p/2P5/1Q5K b - - 0 1", "c7", "c5", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"R1n3bk/N1pP4/8/B3p3/P4n2/3P3p/2P5/1Q5K w - - 0 1", "c2", "c4", PromotionPiece::NONE, {4, 3}, {1, 1}, {1, 2}, {1, 0}, {1, 0}},
+	GameUnmakeMoveTestParams{"R1n3bk/N1pP4/8/B3p3/P4n2/3P3p/2P5/1Q5K b - - 0 1", "c7", "c5", PromotionPiece::NONE, {4, 3}, {1, 1}, {1, 2}, {1, 0}, {1, 0}},
 	// En passant
-	GameUnmakeMoveTestParams{"rnbqkbnr/p1pppppp/8/1pP5/8/8/PPPPP1PP/RNBQKBNR w KQkq b6 0 1", "c5", "b6", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"rnbqkbnr/ppp1pppp/8/8/2Pp4/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1", "d4", "c3", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"rnbqkbnr/p1pppppp/8/1pP5/8/8/PPPPP1PP/RNBQKBNR w KQkq b6 0 1", "c5", "b6", PromotionPiece::NONE, {8, 8}, {2, 2}, {2, 2}, {2, 2}, {1, 1}},
+	GameUnmakeMoveTestParams{"rnbqkbnr/ppp1pppp/8/8/2Pp4/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1", "d4", "c3", PromotionPiece::NONE, {8, 8}, {2, 2}, {2, 2}, {2, 2}, {1, 1}},
 	// Castling
-	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQkq - 0 1", "e1", "g1", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQkq - 0 1", "e1", "c1", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R b KQkq - 0 1", "e8", "g8", PromotionPiece::NONE},
-	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R b KQkq - 0 1", "e8", "c8", PromotionPiece::NONE},
+	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQkq - 0 1", "e1", "g1", PromotionPiece::NONE, {8, 8}, {2, 2}, {2, 2}, {2, 2}, {1, 1}},
+	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R w KQkq - 0 1", "e1", "c1", PromotionPiece::NONE, {8, 8}, {2, 2}, {2, 2}, {2, 2}, {1, 1}},
+	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R b KQkq - 0 1", "e8", "g8", PromotionPiece::NONE, {8, 8}, {2, 2}, {2, 2}, {2, 2}, {1, 1}},
+	GameUnmakeMoveTestParams{"r3k2r/pppppppp/8/1nbqbn2/8/1NBQBN2/PPPPPPPP/R3K2R b KQkq - 0 1", "e8", "c8", PromotionPiece::NONE, {8, 8}, {2, 2}, {2, 2}, {2, 2}, {1, 1}},
 	// Promotion
-	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::BISHOP},
-	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::KNIGHT},
-	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::ROOK},
-	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::QUEEN},
-	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::BISHOP},
-	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::KNIGHT},
-	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::ROOK},
-	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::QUEEN}
+	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::BISHOP, {3, 5}, {1, 1}, {1, 1}, {1, 1}, {0, 0}},
+	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::KNIGHT, {3, 5}, {1, 1}, {1, 1}, {1, 1}, {0, 0}},
+	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::ROOK, {3, 5}, {1, 1}, {1, 1}, {1, 1}, {0, 0}},
+	GameUnmakeMoveTestParams{"3nk2r/pP1bpppp/8/8/8/8/4P2P/4KBNR w Kk - 0 1", "b7", "b8", PromotionPiece::QUEEN, {3, 5}, {1, 1}, {1, 1}, {1, 1}, {0, 0}},
+	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::BISHOP, {6, 7}, {1, 1}, {1, 1}, {1, 2}, {0, 0}},
+	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::KNIGHT, {6, 7}, {1, 1}, {1, 1}, {1, 2}, {0, 0}},
+	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::ROOK, {6, 7}, {1, 1}, {1, 1}, {1, 2}, {0, 0}},
+	GameUnmakeMoveTestParams{"4kbnr/pr1ppppp/8/8/8/8/Pp1PPPPP/3BK1NR b K - 0 1", "b2", "b1", PromotionPiece::QUEEN, {6, 7}, {1, 1}, {1, 1}, {1, 2}, {0, 0}}
 );
 
 INSTANTIATE_TEST_SUITE_P(GameUnmakeMoveTests, GameUnmakeMoveTest, gameUnmakeMoveTestParams);
@@ -294,3 +312,67 @@ TEST(GameUnmakeMoveTest, GameUnmakeMoveEmptyHistory)
 		}
 	}, std::invalid_argument);
 }
+
+struct PerftTestParams
+{
+	int depth;
+	std::map<std::string, int> expectedOutput;
+};
+
+class PerftTest : public ::testing::TestWithParam<PerftTestParams> {};
+
+TEST_P(PerftTest, Perft)
+{
+	auto params = GetParam();
+
+	Game game("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	std::map<std::string, int> output;
+	game.perftRoot(params.depth, output);
+
+	EXPECT_EQ(output, params.expectedOutput);
+}
+
+auto perftTestParams = ::testing::Values(
+	PerftTestParams{1, {{"a2a3", 1}, {"b2b3", 1}, {"c2c3", 1}, {"d2d3", 1}, {"e2e3", 1}, {"f2f3", 1}, {"g2g3", 1}, {"h2h3", 1}, {"a2a4", 1}, {"b2b4", 1}, {"c2c4", 1}, {"d2d4", 1}, {"e2e4", 1}, {"f2f4", 1}, {"g2g4", 1}, {"h2h4", 1}, {"b1a3", 1}, {"b1c3", 1}, {"g1f3", 1}, {"g1h3", 1}, {"Nodes", 20}}},
+	PerftTestParams{2, {{"a2a3", 20}, {"b2b3", 20}, {"c2c3", 20}, {"d2d3", 20}, {"e2e3", 20}, {"f2f3", 20}, {"g2g3", 20}, {"h2h3", 20}, {"a2a4", 20}, {"b2b4", 20}, {"c2c4", 20}, {"d2d4", 20}, {"e2e4", 20}, {"f2f4", 20}, {"g2g4", 20}, {"h2h4", 20}, {"b1a3", 20}, {"b1c3", 20}, {"g1f3", 20}, {"g1h3", 20}, {"Nodes", 400}}},
+	PerftTestParams{3, {{"a2a3", 380}, {"b2b3", 420}, {"c2c3", 420}, {"d2d3", 539}, {"e2e3", 599}, {"f2f3", 380}, {"g2g3", 420}, {"h2h3", 380}, {"a2a4", 420}, {"b2b4", 421}, {"c2c4", 441}, {"d2d4", 560}, {"e2e4", 600}, {"f2f4", 401}, {"g2g4", 421}, {"h2h4", 420}, {"b1a3", 400}, {"b1c3", 440}, {"g1f3", 440}, {"g1h3", 400}, {"Nodes", 8902}}},
+	PerftTestParams{4, {{"a2a3", 8457}, {"b2b3", 9345}, {"c2c3", 9272}, {"d2d3", 11959}, {"e2e3", 13134}, {"f2f3", 8457}, {"g2g3", 9345}, {"h2h3", 8457}, {"a2a4", 9329}, {"b2b4", 9332}, {"c2c4", 9744}, {"d2d4", 12435}, {"e2e4", 13160}, {"f2f4", 8929}, {"g2g4", 9328}, {"h2h4", 9329}, {"b1a3", 8885}, {"b1c3", 9755}, {"g1f3", 9748}, {"g1h3", 8881}, {"Nodes", 197281}}},
+	PerftTestParams{5, {{"a2a3", 181046}, {"b2b3", 215255}, {"c2c3", 222861}, {"d2d3", 328511}, {"e2e3", 402988}, {"f2f3", 178889}, {"g2g3", 217210}, {"h2h3", 181044}, {"a2a4", 217832}, {"b2b4", 216145}, {"c2c4", 240082}, {"d2d4", 361790}, {"e2e4", 405385}, {"f2f4", 198473}, {"g2g4", 214048}, {"h2h4", 218829}, {"b1a3", 198572}, {"b1c3", 234656}, {"g1f3", 233491}, {"g1h3", 198502}, {"Nodes", 4865609}}},
+	PerftTestParams{6, {{"a2a3", 4463267}, {"b2b3", 5310358}, {"c2c3", 5417640}, {"d2d3", 8073082}, {"e2e3", 9726018}, {"f2f3", 4404141}, {"g2g3", 5346260}, {"h2h3", 4463070}, {"a2a4", 5363555}, {"b2b4", 5293555}, {"c2c4", 5866666}, {"d2d4", 8879566}, {"e2e4", 9771632}, {"f2f4", 4890429}, {"g2g4", 5239875}, {"h2h4", 5385554}, {"b1a3", 4856835}, {"b1c3", 5708064}, {"g1f3", 5723523}, {"g1h3", 4877234}, {"Nodes", 119060324}}}
+);
+
+INSTANTIATE_TEST_SUITE_P(PerftTestsStartingPosition, PerftTest, perftTestParams);
+
+// TEST(CustomPerft, customFen)
+// {
+// 	Game game("rnbqkbnr/ppp1pppp/8/3p4/8/2P5/PP1PPPPP/RNBQKBNR w KQkq d6 0 2");
+// 	std::map<std::string, int> output;
+// 	game.perftRoot(1, output);
+
+// 	std::map<std::string, int> expectedOutput = {
+// 		{"a2a3", 1},
+// 		{"b2b3", 1},
+// 		{"d2d3", 1},
+// 		{"e2e3", 1},
+// 		{"f2f3", 1},
+// 		{"g2g3", 1},
+// 		{"h2h3", 1},
+// 		{"c3c4", 1},
+// 		{"a2a4", 1},
+// 		{"b2b4", 1},
+// 		{"d2d4", 1},
+// 		{"e2e4", 1},
+// 		{"f2f4", 1},
+// 		{"g2g4", 1},
+// 		{"h2h4", 1},
+// 		{"b1a3", 1},
+// 		{"g1f3", 1},
+// 		{"g1h3", 1},
+// 		{"d1c2", 1},
+// 		{"d1b3", 1},
+// 		{"d1a4", 1},
+// 		{"Nodes", 21}
+// 	};
+
+// 	EXPECT_EQ(output, expectedOutput);
+// }
