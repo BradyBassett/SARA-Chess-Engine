@@ -486,11 +486,16 @@ bool Game::isValidMove(Position from, Position to, PieceType piece)
 
 bool Game::movePutsKingInCheck(Position from, Position to, PieceType piece)
 {
-	makeMove(from, to, PromotionPiece::NONE);
-	bool putsKingInCheck = isInCheck();
-	unmakeMove();
-
-	return putsKingInCheck;
+	try
+	{
+		makeMove(from, to, PromotionPiece::NONE);
+		unmakeMove();
+		return false;
+	}
+	catch(const std::exception& e)
+	{
+		return true;
+	}
 }
 
 Move Game::composeMove(Position from, Position to, PieceType piece, PromotionPiece promotionPiece, CastleRights whiteCastleRights, CastleRights blackCastleRights, int halfMoveClock, int fullMoveNumber)
