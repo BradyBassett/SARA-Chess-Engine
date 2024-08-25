@@ -462,7 +462,6 @@ void Board::unmovePiece(Move move)
 		if (specialMove == SpecialMove::EN_PASSANT)
 		{
 			capturedPiecePosition = Position{to.row + (color == Color::WHITE ? 1 : -1), to.col};
-			setEnPassantTargetSquare(move.getEnPassantTargetSquare().value());
 		}
 
 		setPieceBitboard(capturedPiece.value(), capturedPieceColor, capturedPieceBitboard | Bitboard(capturedPiecePosition));
@@ -471,11 +470,8 @@ void Board::unmovePiece(Move move)
 		setPieceList(capturedPiece.value(), capturedPieceColor, capturedPieceList);
 	}
 
-	// Undo DOUBLE_PAWN_PUSH en passant target square
-	if (specialMove == SpecialMove::DOUBLE_PAWN_PUSH)
-	{
-		setEnPassantTargetSquare(std::nullopt);
-	}
+	// Set the en passant target square back
+	setEnPassantTargetSquare(move.getEnPassantTargetSquare());
 
 	if (specialMove == SpecialMove::KINGSIDE_CASTLE || specialMove == SpecialMove::QUEENSIDE_CASTLE)
 	{
