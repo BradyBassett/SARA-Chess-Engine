@@ -175,6 +175,7 @@ const auto gameMakeMoveTestParams = ::testing::Values(
 	// Double pawn push
 	GameMakeMoveTestParams{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "e2", "e4", PromotionPiece::NONE, PieceType::PAWN, std::nullopt, SpecialMove::DOUBLE_PAWN_PUSH, "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"},
 	GameMakeMoveTestParams{"rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", "e7", "e5", PromotionPiece::NONE, PieceType::PAWN, std::nullopt, SpecialMove::DOUBLE_PAWN_PUSH, "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2"},
+	GameMakeMoveTestParams{"r1bqkbnr/pppppppp/n7/P7/8/8/1PPPPPPP/RNBQKBNR b KQkq - 0 2", "b7", "b5", PromotionPiece::NONE, PieceType::PAWN, std::nullopt, SpecialMove::DOUBLE_PAWN_PUSH, "r1bqkbnr/p1pppppp/n7/Pp6/8/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 3"},
 	// En passant
 	GameMakeMoveTestParams{"rnbqkbnr/pppp1ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 1", "d5", "e6", PromotionPiece::NONE, PieceType::PAWN, PieceType::PAWN, SpecialMove::EN_PASSANT, "rnbqkbnr/pppp1ppp/4P3/8/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"},
 	GameMakeMoveTestParams{"rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", "d4", "e3", PromotionPiece::NONE, PieceType::PAWN, PieceType::PAWN, SpecialMove::EN_PASSANT, "rnbqkbnr/ppp1pppp/8/8/8/4p3/PPPP1PPP/RNBQKBNR w KQkq - 0 2"},
