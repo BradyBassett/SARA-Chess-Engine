@@ -278,6 +278,7 @@ auto gameUnmakeMoveTestParams = ::testing::Values(
 	// Double pawn push
 	GameUnmakeMoveTestParams{"R1n3bk/N1pP4/8/B3p3/P4n2/3P3p/2P5/1Q5K w - - 0 1", "c2", "c4", PromotionPiece::NONE, {4, 3}, {1, 1}, {1, 2}, {1, 0}, {1, 0}},
 	GameUnmakeMoveTestParams{"R1n3bk/N1pP4/8/B3p3/P4n2/3P3p/2P5/1Q5K b - - 0 1", "c7", "c5", PromotionPiece::NONE, {4, 3}, {1, 1}, {1, 2}, {1, 0}, {1, 0}},
+	GameUnmakeMoveTestParams{"rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", "e7", "e5", PromotionPiece::NONE, {8, 8}, {2, 2}, {2, 2}, {2, 2}, {1, 1}},
 	// En passant
 	GameUnmakeMoveTestParams{"rnbqkbnr/p1pppppp/8/1pP5/8/8/PPPPP1PP/RNBQKBNR w KQkq b6 0 1", "c5", "b6", PromotionPiece::NONE, {8, 8}, {2, 2}, {2, 2}, {2, 2}, {1, 1}},
 	GameUnmakeMoveTestParams{"rnbqkbnr/ppp1pppp/8/8/2Pp4/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1", "d4", "c3", PromotionPiece::NONE, {8, 8}, {2, 2}, {2, 2}, {2, 2}, {1, 1}},

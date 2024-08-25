@@ -255,6 +255,7 @@ std::vector<Move> Game::generateLegalMoves()
 			}
 
 			// If move puts friendly king in check, continue
+			// ! might need to be adjusted to account for promotion pieces
 			if (movePutsKingInCheck(from, to, piece.value()))
 			{
 				continue;
