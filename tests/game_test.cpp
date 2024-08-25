@@ -261,6 +261,7 @@ auto gameUnmakeMoveTestParams = ::testing::Values(
 	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "a7", "a3", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
 	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "e6", "c8", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
 	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "b2", "a1", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
+	GameUnmakeMoveTestParams{"5B2/rB5p/2bpqP2/3N1p2/2Kp4/5R2/1k2pP1n/7N b - - 0 1", "b2", "a1", PromotionPiece::NONE, {2, 5}, {2, 1}, {2, 1}, {1, 1}, {0, 1}},
 	// Ordinary capturing moves
 	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "d5", "c6", PromotionPiece::NONE, {2, 5}, {2, 0}, {1, 1}, {1, 1}, {1, 1}},
 	GameUnmakeMoveTestParams{"Q3B2r/2K3n1/2p2B2/3PR2p/pp3P2/1p6/N5k1/2q5 w - - 0 1", "e8", "c6", PromotionPiece::NONE, {2, 5}, {2, 0}, {1, 1}, {1, 1}, {1, 1}},
