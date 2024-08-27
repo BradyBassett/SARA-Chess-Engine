@@ -308,7 +308,7 @@ void MoveValidator::validateCastlingMove(Position from, Position to, Color frien
 
 		// Check if the squares between the king and the rook are empty
 		int direction = (to.col > from.col) ? 1 : -1;
-		for (int i = from.col + direction; (i < 7 && i > 0); i += direction)
+		for (int i = from.col + direction; (i < 6 && i > 1); i += direction)
 		{
 			if (board.getOccupiedBitboard().getBit(Position{from.row, i}) != 0)
 			{
