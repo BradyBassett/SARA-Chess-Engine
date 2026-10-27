@@ -102,21 +102,19 @@ bool MoveValidator::isSquareAttacked(Board &board, Color friendlyColor, int squa
 	if (board.getPawns(opponentColor).count > 0)
 	{
 		Bitboard enemyPawns = board.getPieceBitboard(PieceType::PAWN, opponentColor);
-		Bitboard pawnAttacks = board.getAttacks(PieceType::PAWN, opponentColor, square);
+		Bitboard pawnAttacks = board.getAttacks(PieceType::PAWN, friendlyColor, square);
 		if (pawnAttacks.getValue() & enemyPawns.getValue())
 		{
 			return true;
 		}
 	}
 
-	if (board.getKing(opponentColor))
+	// Every legal position has exactly one king for each color, so we don't need to check if it exists
+	Bitboard enemyKings = board.getPieceBitboard(PieceType::KING, opponentColor);
+	Bitboard kingAttacks = board.getAttacks(PieceType::KING, opponentColor, square);
+	if (kingAttacks.getValue() & enemyKings.getValue())
 	{
-		Bitboard enemyKings = board.getPieceBitboard(PieceType::KING, opponentColor);
-		Bitboard kingAttacks = board.getAttacks(PieceType::KING, opponentColor, square);
-		if (kingAttacks.getValue() & enemyKings.getValue())
-		{
-			return true;
-		}
+		return true;
 	}
 
 	return false;
