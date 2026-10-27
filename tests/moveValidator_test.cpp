@@ -236,3 +236,69 @@ const auto findAbsolutePinsTestParams = ::testing::Values(
 );
 
 INSTANTIATE_TEST_SUITE_P(findAbsolutePinsTest, findAbsolutePinsTest, findAbsolutePinsTestParams);
+
+struct IsSquareAttackedTestParams {
+	std::string fenPosition;
+	Color friendlyColor;
+	std::string square;
+	bool expected;
+};
+
+class isSquareAttackedTest : public ::testing::TestWithParam<IsSquareAttackedTestParams> {};
+
+TEST_P(isSquareAttackedTest, isSquareAttacked) {
+	auto params = GetParam();
+	Board board(params.fenPosition, "-");
+	int square = Utility::calculateSquareNumber(Utility::convertStringToPosition(params.square));
+	EXPECT_EQ(MoveValidator::isSquareAttacked(board, params.friendlyColor, square), params.expected);
+}
+
+const auto isSquareAttackedTestParams = ::testing::Values(
+	// Rook attacks
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/8/K3r3", Color::WHITE, "d1", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/8/K3r3", Color::WHITE, "e5", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/8/K3r3", Color::WHITE, "f2", false},
+	// Slider attacks stop at the first blocker, which is itself attacked
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/4P3/K3r3", Color::WHITE, "e2", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/4P3/K3r3", Color::WHITE, "e3", false},
+	// Bishop attacks
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/8/K6b", Color::WHITE, "g2", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/8/K6b", Color::WHITE, "c6", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/8/K6b", Color::WHITE, "g1", false},
+	// Queen attacks
+	IsSquareAttackedTestParams{"3q4/8/8/8/8/8/8/K6k", Color::WHITE, "d1", true},
+	IsSquareAttackedTestParams{"3q4/8/8/8/8/8/8/K6k", Color::WHITE, "a5", true},
+	IsSquareAttackedTestParams{"3q4/8/8/8/8/8/8/K6k", Color::WHITE, "e3", false},
+	// Knight attacks
+	IsSquareAttackedTestParams{"4k3/8/8/8/3n4/8/8/K7", Color::WHITE, "c2", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/3n4/8/8/K7", Color::WHITE, "e6", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/3n4/8/8/K7", Color::WHITE, "d3", false},
+	// Pawn attacks are diagonal and in the pawn's direction of travel
+	IsSquareAttackedTestParams{"4k3/8/8/8/3p4/8/8/K7", Color::WHITE, "c3", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/3p4/8/8/K7", Color::WHITE, "e3", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/3p4/8/8/K7", Color::WHITE, "d3", false},
+	IsSquareAttackedTestParams{"4k3/8/8/8/3p4/8/8/K7", Color::WHITE, "c5", false},
+	IsSquareAttackedTestParams{"4k3/8/8/3P4/8/8/8/K7", Color::BLACK, "c6", true},
+	IsSquareAttackedTestParams{"4k3/8/8/3P4/8/8/8/K7", Color::BLACK, "e6", true},
+	IsSquareAttackedTestParams{"4k3/8/8/3P4/8/8/8/K7", Color::BLACK, "d6", false},
+	IsSquareAttackedTestParams{"4k3/8/8/3P4/8/8/8/K7", Color::BLACK, "c4", false},
+	// King attacks
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/8/K7", Color::WHITE, "d7", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/8/K7", Color::WHITE, "f8", true},
+	IsSquareAttackedTestParams{"4k3/8/8/8/8/8/8/K7", Color::WHITE, "e6", false},
+	// Regression: an opponent king on square 0 (a8) must still attack its adjacent squares
+	IsSquareAttackedTestParams{"k7/8/8/8/8/8/8/7K", Color::WHITE, "a7", true},
+	IsSquareAttackedTestParams{"k7/8/8/8/8/8/8/7K", Color::WHITE, "b7", true},
+	IsSquareAttackedTestParams{"k7/8/8/8/8/8/8/7K", Color::WHITE, "b8", true},
+	IsSquareAttackedTestParams{"k7/8/8/8/8/8/8/7K", Color::WHITE, "c7", false},
+	IsSquareAttackedTestParams{"k7/8/8/8/8/8/8/7K", Color::WHITE, "a6", false},
+	IsSquareAttackedTestParams{"K7/8/8/8/8/8/8/7k", Color::BLACK, "a7", true},
+	IsSquareAttackedTestParams{"K7/8/8/8/8/8/8/7k", Color::BLACK, "b7", true},
+	IsSquareAttackedTestParams{"K7/8/8/8/8/8/8/7k", Color::BLACK, "b8", true},
+	// Control for the a8 regression: the same pattern with the opponent king on h8
+	IsSquareAttackedTestParams{"7k/8/8/8/8/8/8/K7", Color::WHITE, "g7", true},
+	IsSquareAttackedTestParams{"7k/8/8/8/8/8/8/K7", Color::WHITE, "g8", true},
+	IsSquareAttackedTestParams{"7k/8/8/8/8/8/8/K7", Color::WHITE, "h7", true}
+);
+
+INSTANTIATE_TEST_SUITE_P(isSquareAttackedTest, isSquareAttackedTest, isSquareAttackedTestParams);
